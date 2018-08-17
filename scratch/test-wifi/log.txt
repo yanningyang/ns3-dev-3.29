@@ -1,0 +1,665 @@
+Waf: Entering directory `/home/haha/ns3.29-dev-workspace/ns-3-allinone/ns-3-dev/build'
+Waf: Leaving directory `/home/haha/ns3.29-dev-workspace/ns-3-allinone/ns-3-dev/build'
+Build commands will be stored in build/compile_commands.json
+'build' finished successfully (2.003s)
+sim time:0, event: send data.
+sim time:0.0128951, clock: 0.212882 src: 10.1.0.1 dest: 10.1.0.0
+sim time:0.0128952, clock: 0.213162 src: 10.1.0.1 dest: 10.1.0.0
+sim time:0.0128952, clock: 0.213372 src: 10.1.0.1 dest: 10.1.0.0
+sim time:0.0128953, clock: 0.21358 src: 10.1.0.1 dest: 10.1.0.0
+sim time:0.0128953, clock: 0.213833 src: 10.1.0.1 dest: 10.1.0.0
+sim time:0.0128954, clock: 0.21407 src: 10.1.0.1 dest: 10.1.0.0
+sim time:0.0128954, clock: 0.21428 src: 10.1.0.1 dest: 10.1.0.0
+sim time:0.0128955, clock: 0.214487 src: 10.1.0.1 dest: 10.1.0.0
+sim time:0.0128955, clock: 0.214693 src: 10.1.0.1 dest: 10.1.0.0
+sim time:0.0128955, clock: 0.214934 src: 10.1.0.1 dest: 10.1.0.0
+sim time:1, event: send data.
+sim time:2, event: send data.
+sim time:2.0129, clock: 0.216105 src: 10.1.0.1 dest: 10.1.0.0
+sim time:2.0129, clock: 0.216306 src: 10.1.0.1 dest: 10.1.0.0
+sim time:2.0129, clock: 0.216489 src: 10.1.0.1 dest: 10.1.0.0
+sim time:2.0129, clock: 0.21667 src: 10.1.0.1 dest: 10.1.0.0
+sim time:2.0129, clock: 0.216897 src: 10.1.0.1 dest: 10.1.0.0
+sim time:2.0129, clock: 0.217085 src: 10.1.0.1 dest: 10.1.0.0
+sim time:2.0129, clock: 0.217267 src: 10.1.0.1 dest: 10.1.0.0
+sim time:2.0129, clock: 0.217447 src: 10.1.0.1 dest: 10.1.0.0
+sim time:2.0129, clock: 0.217643 src: 10.1.0.1 dest: 10.1.0.0
+sim time:2.0129, clock: 0.217879 src: 10.1.0.1 dest: 10.1.0.0
+sim time:3, event: send data.
+sim time:4, event: send data.
+sim time:4.0129, clock: 0.218976 src: 10.1.0.1 dest: 10.1.0.0
+sim time:4.0129, clock: 0.219164 src: 10.1.0.1 dest: 10.1.0.0
+sim time:4.0129, clock: 0.219346 src: 10.1.0.1 dest: 10.1.0.0
+sim time:4.0129, clock: 0.219527 src: 10.1.0.1 dest: 10.1.0.0
+sim time:4.0129, clock: 0.219746 src: 10.1.0.1 dest: 10.1.0.0
+sim time:4.0129, clock: 0.219941 src: 10.1.0.1 dest: 10.1.0.0
+sim time:4.0129, clock: 0.220123 src: 10.1.0.1 dest: 10.1.0.0
+sim time:4.0129, clock: 0.220303 src: 10.1.0.1 dest: 10.1.0.0
+sim time:4.0129, clock: 0.220482 src: 10.1.0.1 dest: 10.1.0.0
+sim time:4.0129, clock: 0.220677 src: 10.1.0.1 dest: 10.1.0.0
+sim time:5, event: send data.
+sim time:6, event: send data.
+sim time:6.0129, clock: 0.221771 src: 10.1.0.1 dest: 10.1.0.0
+sim time:6.0129, clock: 0.221968 src: 10.1.0.1 dest: 10.1.0.0
+sim time:6.0129, clock: 0.222147 src: 10.1.0.1 dest: 10.1.0.0
+sim time:6.0129, clock: 0.222325 src: 10.1.0.1 dest: 10.1.0.0
+sim time:6.0129, clock: 0.222503 src: 10.1.0.1 dest: 10.1.0.0
+sim time:6.0129, clock: 0.222697 src: 10.1.0.1 dest: 10.1.0.0
+sim time:6.0129, clock: 0.222914 src: 10.1.0.1 dest: 10.1.0.0
+sim time:6.0129, clock: 0.223093 src: 10.1.0.1 dest: 10.1.0.0
+sim time:6.0129, clock: 0.223269 src: 10.1.0.1 dest: 10.1.0.0
+sim time:6.0129, clock: 0.223444 src: 10.1.0.1 dest: 10.1.0.0
+sim time:7, event: send data.
+sim time:8, event: send data.
+sim time:8.0129, clock: 0.224558 src: 10.1.0.1 dest: 10.1.0.0
+sim time:8.0129, clock: 0.224777 src: 10.1.0.1 dest: 10.1.0.0
+sim time:8.0129, clock: 0.224973 src: 10.1.0.1 dest: 10.1.0.0
+sim time:8.0129, clock: 0.225158 src: 10.1.0.1 dest: 10.1.0.0
+sim time:8.0129, clock: 0.225341 src: 10.1.0.1 dest: 10.1.0.0
+sim time:8.0129, clock: 0.225524 src: 10.1.0.1 dest: 10.1.0.0
+sim time:8.0129, clock: 0.225706 src: 10.1.0.1 dest: 10.1.0.0
+sim time:8.0129, clock: 0.225939 src: 10.1.0.1 dest: 10.1.0.0
+sim time:8.0129, clock: 0.226128 src: 10.1.0.1 dest: 10.1.0.0
+sim time:8.0129, clock: 0.226312 src: 10.1.0.1 dest: 10.1.0.0
+sim time:9, event: send data.
+sim time:10, event: send data.
+sim time:10.0129, clock: 0.227353 src: 10.1.0.1 dest: 10.1.0.0
+sim time:10.0129, clock: 0.227544 src: 10.1.0.1 dest: 10.1.0.0
+sim time:10.0129, clock: 0.227757 src: 10.1.0.1 dest: 10.1.0.0
+sim time:10.0129, clock: 0.227953 src: 10.1.0.1 dest: 10.1.0.0
+sim time:10.0129, clock: 0.228139 src: 10.1.0.1 dest: 10.1.0.0
+sim time:10.0129, clock: 0.228324 src: 10.1.0.1 dest: 10.1.0.0
+sim time:10.0129, clock: 0.228529 src: 10.1.0.1 dest: 10.1.0.0
+sim time:10.0129, clock: 0.228741 src: 10.1.0.1 dest: 10.1.0.0
+sim time:10.0129, clock: 0.228938 src: 10.1.0.1 dest: 10.1.0.0
+sim time:10.0129, clock: 0.229123 src: 10.1.0.1 dest: 10.1.0.0
+sim time:11, event: send data.
+sim time:12, event: send data.
+sim time:12.0129, clock: 0.230255 src: 10.1.0.1 dest: 10.1.0.0
+sim time:12.0129, clock: 0.230449 src: 10.1.0.1 dest: 10.1.0.0
+sim time:12.0129, clock: 0.230637 src: 10.1.0.1 dest: 10.1.0.0
+sim time:12.0129, clock: 0.230858 src: 10.1.0.1 dest: 10.1.0.0
+sim time:12.0129, clock: 0.231048 src: 10.1.0.1 dest: 10.1.0.0
+sim time:12.0129, clock: 0.231236 src: 10.1.0.1 dest: 10.1.0.0
+sim time:12.0129, clock: 0.231422 src: 10.1.0.1 dest: 10.1.0.0
+sim time:12.0129, clock: 0.23161 src: 10.1.0.1 dest: 10.1.0.0
+sim time:12.0129, clock: 0.231833 src: 10.1.0.1 dest: 10.1.0.0
+sim time:12.0129, clock: 0.232029 src: 10.1.0.1 dest: 10.1.0.0
+sim time:13, event: send data.
+sim time:14, event: send data.
+sim time:14.0129, clock: 0.233598 src: 10.1.0.1 dest: 10.1.0.0
+sim time:14.0129, clock: 0.23385 src: 10.1.0.1 dest: 10.1.0.0
+sim time:14.0129, clock: 0.234076 src: 10.1.0.1 dest: 10.1.0.0
+sim time:14.0129, clock: 0.234322 src: 10.1.0.1 dest: 10.1.0.0
+sim time:14.0129, clock: 0.234518 src: 10.1.0.1 dest: 10.1.0.0
+sim time:14.0129, clock: 0.234733 src: 10.1.0.1 dest: 10.1.0.0
+sim time:14.0129, clock: 0.234929 src: 10.1.0.1 dest: 10.1.0.0
+sim time:14.0129, clock: 0.235115 src: 10.1.0.1 dest: 10.1.0.0
+sim time:14.0129, clock: 0.235299 src: 10.1.0.1 dest: 10.1.0.0
+sim time:14.0129, clock: 0.235483 src: 10.1.0.1 dest: 10.1.0.0
+sim time:15, event: send data.
+sim time:16, event: send data.
+sim time:16.0129, clock: 0.236543 src: 10.1.0.1 dest: 10.1.0.0
+sim time:16.0129, clock: 0.236761 src: 10.1.0.1 dest: 10.1.0.0
+sim time:16.0129, clock: 0.236956 src: 10.1.0.1 dest: 10.1.0.0
+sim time:16.0129, clock: 0.237141 src: 10.1.0.1 dest: 10.1.0.0
+sim time:16.0129, clock: 0.237326 src: 10.1.0.1 dest: 10.1.0.0
+sim time:16.0129, clock: 0.23751 src: 10.1.0.1 dest: 10.1.0.0
+sim time:16.0129, clock: 0.237728 src: 10.1.0.1 dest: 10.1.0.0
+sim time:16.0129, clock: 0.238005 src: 10.1.0.1 dest: 10.1.0.0
+sim time:16.0129, clock: 0.238191 src: 10.1.0.1 dest: 10.1.0.0
+sim time:16.0129, clock: 0.238376 src: 10.1.0.1 dest: 10.1.0.0
+sim time:17, event: send data.
+sim time:18, event: send data.
+sim time:18.0129, clock: 0.239498 src: 10.1.0.1 dest: 10.1.0.0
+sim time:18.0129, clock: 0.239718 src: 10.1.0.1 dest: 10.1.0.0
+sim time:18.0129, clock: 0.239914 src: 10.1.0.1 dest: 10.1.0.0
+sim time:18.0129, clock: 0.2401 src: 10.1.0.1 dest: 10.1.0.0
+sim time:18.0129, clock: 0.240284 src: 10.1.0.1 dest: 10.1.0.0
+sim time:18.0129, clock: 0.240468 src: 10.1.0.1 dest: 10.1.0.0
+sim time:18.0129, clock: 0.240666 src: 10.1.0.1 dest: 10.1.0.0
+sim time:18.0129, clock: 0.240873 src: 10.1.0.1 dest: 10.1.0.0
+sim time:18.0129, clock: 0.241058 src: 10.1.0.1 dest: 10.1.0.0
+sim time:18.0129, clock: 0.241241 src: 10.1.0.1 dest: 10.1.0.0
+sim time:19, event: send data.
+sim time:20, event: send data.
+sim time:20.0129, clock: 0.242396 src: 10.1.0.1 dest: 10.1.0.0
+sim time:20.0129, clock: 0.242589 src: 10.1.0.1 dest: 10.1.0.0
+sim time:20.0129, clock: 0.242809 src: 10.1.0.1 dest: 10.1.0.0
+sim time:20.0129, clock: 0.242998 src: 10.1.0.1 dest: 10.1.0.0
+sim time:20.0129, clock: 0.243181 src: 10.1.0.1 dest: 10.1.0.0
+sim time:20.0129, clock: 0.243364 src: 10.1.0.1 dest: 10.1.0.0
+sim time:20.0129, clock: 0.243548 src: 10.1.0.1 dest: 10.1.0.0
+sim time:20.0129, clock: 0.243764 src: 10.1.0.1 dest: 10.1.0.0
+sim time:20.0129, clock: 0.243961 src: 10.1.0.1 dest: 10.1.0.0
+sim time:20.0129, clock: 0.244146 src: 10.1.0.1 dest: 10.1.0.0
+sim time:21, event: send data.
+sim time:22, event: send data.
+sim time:22.0129, clock: 0.245192 src: 10.1.0.1 dest: 10.1.0.0
+sim time:22.0129, clock: 0.245385 src: 10.1.0.1 dest: 10.1.0.0
+sim time:22.0129, clock: 0.24557 src: 10.1.0.1 dest: 10.1.0.0
+sim time:22.0129, clock: 0.245807 src: 10.1.0.1 dest: 10.1.0.0
+sim time:22.0129, clock: 0.245997 src: 10.1.0.1 dest: 10.1.0.0
+sim time:22.0129, clock: 0.246182 src: 10.1.0.1 dest: 10.1.0.0
+sim time:22.0129, clock: 0.246388 src: 10.1.0.1 dest: 10.1.0.0
+sim time:22.0129, clock: 0.246572 src: 10.1.0.1 dest: 10.1.0.0
+sim time:22.0129, clock: 0.24679 src: 10.1.0.1 dest: 10.1.0.0
+sim time:22.0129, clock: 0.24698 src: 10.1.0.1 dest: 10.1.0.0
+sim time:23, event: send data.
+sim time:24, event: send data.
+sim time:24.0129, clock: 0.248072 src: 10.1.0.1 dest: 10.1.0.0
+sim time:24.0129, clock: 0.248265 src: 10.1.0.1 dest: 10.1.0.0
+sim time:24.0129, clock: 0.248453 src: 10.1.0.1 dest: 10.1.0.0
+sim time:24.0129, clock: 0.24867 src: 10.1.0.1 dest: 10.1.0.0
+sim time:24.0129, clock: 0.248885 src: 10.1.0.1 dest: 10.1.0.0
+sim time:24.0129, clock: 0.249079 src: 10.1.0.1 dest: 10.1.0.0
+sim time:24.0129, clock: 0.249268 src: 10.1.0.1 dest: 10.1.0.0
+sim time:24.0129, clock: 0.249456 src: 10.1.0.1 dest: 10.1.0.0
+sim time:24.0129, clock: 0.2497 src: 10.1.0.1 dest: 10.1.0.0
+sim time:24.0129, clock: 0.249908 src: 10.1.0.1 dest: 10.1.0.0
+sim time:25, event: send data.
+sim time:26, event: send data.
+sim time:26.0129, clock: 0.251166 src: 10.1.0.1 dest: 10.1.0.0
+sim time:26.0129, clock: 0.251453 src: 10.1.0.1 dest: 10.1.0.0
+sim time:26.0129, clock: 0.251748 src: 10.1.0.1 dest: 10.1.0.0
+sim time:26.0129, clock: 0.251974 src: 10.1.0.1 dest: 10.1.0.0
+sim time:26.0129, clock: 0.252163 src: 10.1.0.1 dest: 10.1.0.0
+sim time:26.0129, clock: 0.25235 src: 10.1.0.1 dest: 10.1.0.0
+sim time:26.0129, clock: 0.252564 src: 10.1.0.1 dest: 10.1.0.0
+sim time:26.0129, clock: 0.252787 src: 10.1.0.1 dest: 10.1.0.0
+sim time:26.0129, clock: 0.252978 src: 10.1.0.1 dest: 10.1.0.0
+sim time:26.0129, clock: 0.253164 src: 10.1.0.1 dest: 10.1.0.0
+sim time:27, event: send data.
+sim time:28, event: send data.
+sim time:28.0129, clock: 0.254253 src: 10.1.0.1 dest: 10.1.0.0
+sim time:28.0129, clock: 0.254448 src: 10.1.0.1 dest: 10.1.0.0
+sim time:28.0129, clock: 0.254665 src: 10.1.0.1 dest: 10.1.0.0
+sim time:28.0129, clock: 0.254864 src: 10.1.0.1 dest: 10.1.0.0
+sim time:28.0129, clock: 0.255053 src: 10.1.0.1 dest: 10.1.0.0
+sim time:28.0129, clock: 0.255239 src: 10.1.0.1 dest: 10.1.0.0
+sim time:28.0129, clock: 0.255427 src: 10.1.0.1 dest: 10.1.0.0
+sim time:28.0129, clock: 0.255636 src: 10.1.0.1 dest: 10.1.0.0
+sim time:28.0129, clock: 0.255844 src: 10.1.0.1 dest: 10.1.0.0
+sim time:28.0129, clock: 0.256046 src: 10.1.0.1 dest: 10.1.0.0
+sim time:29, event: send data.
+sim time:30, event: send data.
+sim time:30.0129, clock: 0.257154 src: 10.1.0.1 dest: 10.1.0.0
+sim time:30.0129, clock: 0.257354 src: 10.1.0.1 dest: 10.1.0.0
+sim time:30.0129, clock: 0.257544 src: 10.1.0.1 dest: 10.1.0.0
+sim time:30.0129, clock: 0.25779 src: 10.1.0.1 dest: 10.1.0.0
+sim time:30.0129, clock: 0.257986 src: 10.1.0.1 dest: 10.1.0.0
+sim time:30.0129, clock: 0.258176 src: 10.1.0.1 dest: 10.1.0.0
+sim time:30.0129, clock: 0.258364 src: 10.1.0.1 dest: 10.1.0.0
+sim time:30.0129, clock: 0.258552 src: 10.1.0.1 dest: 10.1.0.0
+sim time:30.0129, clock: 0.258774 src: 10.1.0.1 dest: 10.1.0.0
+sim time:30.0129, clock: 0.258968 src: 10.1.0.1 dest: 10.1.0.0
+sim time:31, event: send data.
+sim time:32, event: send data.
+sim time:32.0129, clock: 0.260055 src: 10.1.0.1 dest: 10.1.0.0
+sim time:32.0129, clock: 0.260249 src: 10.1.0.1 dest: 10.1.0.0
+sim time:32.0129, clock: 0.260436 src: 10.1.0.1 dest: 10.1.0.0
+sim time:32.0129, clock: 0.26065 src: 10.1.0.1 dest: 10.1.0.0
+sim time:32.0129, clock: 0.260849 src: 10.1.0.1 dest: 10.1.0.0
+sim time:32.0129, clock: 0.261036 src: 10.1.0.1 dest: 10.1.0.0
+sim time:32.0129, clock: 0.261221 src: 10.1.0.1 dest: 10.1.0.0
+sim time:32.0129, clock: 0.261407 src: 10.1.0.1 dest: 10.1.0.0
+sim time:32.0129, clock: 0.261628 src: 10.1.0.1 dest: 10.1.0.0
+sim time:32.0129, clock: 0.261834 src: 10.1.0.1 dest: 10.1.0.0
+sim time:33, event: send data.
+sim time:34, event: send data.
+sim time:34.0129, clock: 0.262899 src: 10.1.0.1 dest: 10.1.0.0
+sim time:34.0129, clock: 0.263093 src: 10.1.0.1 dest: 10.1.0.0
+sim time:34.0129, clock: 0.263279 src: 10.1.0.1 dest: 10.1.0.0
+sim time:34.0129, clock: 0.263464 src: 10.1.0.1 dest: 10.1.0.0
+sim time:34.0129, clock: 0.263678 src: 10.1.0.1 dest: 10.1.0.0
+sim time:34.0129, clock: 0.263888 src: 10.1.0.1 dest: 10.1.0.0
+sim time:34.0129, clock: 0.264077 src: 10.1.0.1 dest: 10.1.0.0
+sim time:34.0129, clock: 0.264264 src: 10.1.0.1 dest: 10.1.0.0
+sim time:34.0129, clock: 0.26445 src: 10.1.0.1 dest: 10.1.0.0
+sim time:34.0129, clock: 0.264666 src: 10.1.0.1 dest: 10.1.0.0
+sim time:35, event: send data.
+sim time:36, event: send data.
+sim time:36.0129, clock: 0.265774 src: 10.1.0.1 dest: 10.1.0.0
+sim time:36.0129, clock: 0.266047 src: 10.1.0.1 dest: 10.1.0.0
+sim time:36.0129, clock: 0.266335 src: 10.1.0.1 dest: 10.1.0.0
+sim time:36.0129, clock: 0.266652 src: 10.1.0.1 dest: 10.1.0.0
+sim time:36.0129, clock: 0.266854 src: 10.1.0.1 dest: 10.1.0.0
+sim time:36.0129, clock: 0.267043 src: 10.1.0.1 dest: 10.1.0.0
+sim time:36.0129, clock: 0.267229 src: 10.1.0.1 dest: 10.1.0.0
+sim time:36.0129, clock: 0.267415 src: 10.1.0.1 dest: 10.1.0.0
+sim time:36.0129, clock: 0.267679 src: 10.1.0.1 dest: 10.1.0.0
+sim time:36.0129, clock: 0.267879 src: 10.1.0.1 dest: 10.1.0.0
+sim time:37, event: send data.
+sim time:38, event: send data.
+sim time:38.0129, clock: 0.268943 src: 10.1.0.1 dest: 10.1.0.0
+sim time:38.0129, clock: 0.269136 src: 10.1.0.1 dest: 10.1.0.0
+sim time:38.0129, clock: 0.269325 src: 10.1.0.1 dest: 10.1.0.0
+sim time:38.0129, clock: 0.269512 src: 10.1.0.1 dest: 10.1.0.0
+sim time:38.0129, clock: 0.269749 src: 10.1.0.1 dest: 10.1.0.0
+sim time:38.0129, clock: 0.269943 src: 10.1.0.1 dest: 10.1.0.0
+sim time:38.0129, clock: 0.270129 src: 10.1.0.1 dest: 10.1.0.0
+sim time:38.0129, clock: 0.270314 src: 10.1.0.1 dest: 10.1.0.0
+sim time:38.0129, clock: 0.270499 src: 10.1.0.1 dest: 10.1.0.0
+sim time:38.0129, clock: 0.270721 src: 10.1.0.1 dest: 10.1.0.0
+sim time:39, event: send data.
+sim time:40, event: send data.
+sim time:40.0129, clock: 0.271794 src: 10.1.0.1 dest: 10.1.0.0
+sim time:40.0129, clock: 0.271996 src: 10.1.0.1 dest: 10.1.0.0
+sim time:40.0129, clock: 0.272184 src: 10.1.0.1 dest: 10.1.0.0
+sim time:40.0129, clock: 0.272371 src: 10.1.0.1 dest: 10.1.0.0
+sim time:40.0129, clock: 0.2726 src: 10.1.0.1 dest: 10.1.0.0
+sim time:40.0129, clock: 0.272808 src: 10.1.0.1 dest: 10.1.0.0
+sim time:40.0129, clock: 0.273031 src: 10.1.0.1 dest: 10.1.0.0
+sim time:40.0129, clock: 0.273223 src: 10.1.0.1 dest: 10.1.0.0
+sim time:40.0129, clock: 0.273411 src: 10.1.0.1 dest: 10.1.0.0
+sim time:40.0129, clock: 0.273677 src: 10.1.0.1 dest: 10.1.0.0
+sim time:41, event: send data.
+sim time:42, event: send data.
+sim time:42.0129, clock: 0.274731 src: 10.1.0.1 dest: 10.1.0.0
+sim time:42.0129, clock: 0.274925 src: 10.1.0.1 dest: 10.1.0.0
+sim time:42.0129, clock: 0.275113 src: 10.1.0.1 dest: 10.1.0.0
+sim time:42.0129, clock: 0.2753 src: 10.1.0.1 dest: 10.1.0.0
+sim time:42.0129, clock: 0.275486 src: 10.1.0.1 dest: 10.1.0.0
+sim time:42.0129, clock: 0.275706 src: 10.1.0.1 dest: 10.1.0.0
+sim time:42.0129, clock: 0.275899 src: 10.1.0.1 dest: 10.1.0.0
+sim time:42.0129, clock: 0.276086 src: 10.1.0.1 dest: 10.1.0.0
+sim time:42.0129, clock: 0.276272 src: 10.1.0.1 dest: 10.1.0.0
+sim time:42.0129, clock: 0.276458 src: 10.1.0.1 dest: 10.1.0.0
+sim time:43, event: send data.
+sim time:44, event: send data.
+sim time:44.0129, clock: 0.277561 src: 10.1.0.1 dest: 10.1.0.0
+sim time:44.0129, clock: 0.277775 src: 10.1.0.1 dest: 10.1.0.0
+sim time:44.0129, clock: 0.277963 src: 10.1.0.1 dest: 10.1.0.0
+sim time:44.0129, clock: 0.27815 src: 10.1.0.1 dest: 10.1.0.0
+sim time:44.0129, clock: 0.278336 src: 10.1.0.1 dest: 10.1.0.0
+sim time:44.0129, clock: 0.278585 src: 10.1.0.1 dest: 10.1.0.0
+sim time:44.0129, clock: 0.278785 src: 10.1.0.1 dest: 10.1.0.0
+sim time:44.0129, clock: 0.278974 src: 10.1.0.1 dest: 10.1.0.0
+sim time:44.0129, clock: 0.27916 src: 10.1.0.1 dest: 10.1.0.0
+sim time:44.0129, clock: 0.279348 src: 10.1.0.1 dest: 10.1.0.0
+sim time:45, event: send data.
+sim time:46, event: send data.
+sim time:46.0129, clock: 0.280464 src: 10.1.0.1 dest: 10.1.0.0
+sim time:46.0129, clock: 0.280694 src: 10.1.0.1 dest: 10.1.0.0
+sim time:46.0129, clock: 0.280888 src: 10.1.0.1 dest: 10.1.0.0
+sim time:46.0129, clock: 0.281077 src: 10.1.0.1 dest: 10.1.0.0
+sim time:46.0129, clock: 0.281286 src: 10.1.0.1 dest: 10.1.0.0
+sim time:46.0129, clock: 0.281585 src: 10.1.0.1 dest: 10.1.0.0
+sim time:46.0129, clock: 0.281816 src: 10.1.0.1 dest: 10.1.0.0
+sim time:46.0129, clock: 0.282071 src: 10.1.0.1 dest: 10.1.0.0
+sim time:46.0129, clock: 0.282323 src: 10.1.0.1 dest: 10.1.0.0
+sim time:46.0129, clock: 0.282583 src: 10.1.0.1 dest: 10.1.0.0
+sim time:47, event: send data.
+sim time:48, event: send data.
+sim time:48.0129, clock: 0.283872 src: 10.1.0.1 dest: 10.1.0.0
+sim time:48.0129, clock: 0.284068 src: 10.1.0.1 dest: 10.1.0.0
+sim time:48.0129, clock: 0.284257 src: 10.1.0.1 dest: 10.1.0.0
+sim time:48.0129, clock: 0.284444 src: 10.1.0.1 dest: 10.1.0.0
+sim time:48.0129, clock: 0.284666 src: 10.1.0.1 dest: 10.1.0.0
+sim time:48.0129, clock: 0.284858 src: 10.1.0.1 dest: 10.1.0.0
+sim time:48.0129, clock: 0.285044 src: 10.1.0.1 dest: 10.1.0.0
+sim time:48.0129, clock: 0.28523 src: 10.1.0.1 dest: 10.1.0.0
+sim time:48.0129, clock: 0.285416 src: 10.1.0.1 dest: 10.1.0.0
+sim time:48.0129, clock: 0.285652 src: 10.1.0.1 dest: 10.1.0.0
+sim time:49, event: send data.
+sim time:50, event: send data.
+sim time:50.0129, clock: 0.286706 src: 10.1.0.1 dest: 10.1.0.0
+sim time:50.0129, clock: 0.2869 src: 10.1.0.1 dest: 10.1.0.0
+sim time:50.0129, clock: 0.287087 src: 10.1.0.1 dest: 10.1.0.0
+sim time:50.0129, clock: 0.287275 src: 10.1.0.1 dest: 10.1.0.0
+sim time:50.0129, clock: 0.287461 src: 10.1.0.1 dest: 10.1.0.0
+sim time:50.0129, clock: 0.287682 src: 10.1.0.1 dest: 10.1.0.0
+sim time:50.0129, clock: 0.287872 src: 10.1.0.1 dest: 10.1.0.0
+sim time:50.0129, clock: 0.288059 src: 10.1.0.1 dest: 10.1.0.0
+sim time:50.0129, clock: 0.288245 src: 10.1.0.1 dest: 10.1.0.0
+sim time:50.0129, clock: 0.288431 src: 10.1.0.1 dest: 10.1.0.0
+sim time:51, event: send data.
+sim time:52, event: send data.
+sim time:52.0129, clock: 0.289599 src: 10.1.0.1 dest: 10.1.0.0
+sim time:52.0129, clock: 0.2898 src: 10.1.0.1 dest: 10.1.0.0
+sim time:52.0129, clock: 0.289989 src: 10.1.0.1 dest: 10.1.0.0
+sim time:52.0129, clock: 0.290174 src: 10.1.0.1 dest: 10.1.0.0
+sim time:52.0129, clock: 0.290361 src: 10.1.0.1 dest: 10.1.0.0
+sim time:52.0129, clock: 0.290576 src: 10.1.0.1 dest: 10.1.0.0
+sim time:52.0129, clock: 0.290774 src: 10.1.0.1 dest: 10.1.0.0
+sim time:52.0129, clock: 0.290961 src: 10.1.0.1 dest: 10.1.0.0
+sim time:52.0129, clock: 0.291147 src: 10.1.0.1 dest: 10.1.0.0
+sim time:52.0129, clock: 0.291332 src: 10.1.0.1 dest: 10.1.0.0
+sim time:53, event: send data.
+sim time:54, event: send data.
+sim time:54.0129, clock: 0.292377 src: 10.1.0.1 dest: 10.1.0.0
+sim time:54.0129, clock: 0.292602 src: 10.1.0.1 dest: 10.1.0.0
+sim time:54.0129, clock: 0.292795 src: 10.1.0.1 dest: 10.1.0.0
+sim time:54.0129, clock: 0.292982 src: 10.1.0.1 dest: 10.1.0.0
+sim time:54.0129, clock: 0.293167 src: 10.1.0.1 dest: 10.1.0.0
+sim time:54.0129, clock: 0.293352 src: 10.1.0.1 dest: 10.1.0.0
+sim time:54.0129, clock: 0.293581 src: 10.1.0.1 dest: 10.1.0.0
+sim time:54.0129, clock: 0.293782 src: 10.1.0.1 dest: 10.1.0.0
+sim time:54.0129, clock: 0.293969 src: 10.1.0.1 dest: 10.1.0.0
+sim time:54.0129, clock: 0.294155 src: 10.1.0.1 dest: 10.1.0.0
+sim time:55, event: send data.
+sim time:56, event: send data.
+sim time:56.0129, clock: 0.295315 src: 10.1.0.1 dest: 10.1.0.0
+sim time:56.0129, clock: 0.295537 src: 10.1.0.1 dest: 10.1.0.0
+sim time:56.0129, clock: 0.295735 src: 10.1.0.1 dest: 10.1.0.0
+sim time:56.0129, clock: 0.295924 src: 10.1.0.1 dest: 10.1.0.0
+sim time:56.0129, clock: 0.296111 src: 10.1.0.1 dest: 10.1.0.0
+sim time:56.0129, clock: 0.296298 src: 10.1.0.1 dest: 10.1.0.0
+sim time:56.0129, clock: 0.296505 src: 10.1.0.1 dest: 10.1.0.0
+sim time:56.0129, clock: 0.296707 src: 10.1.0.1 dest: 10.1.0.0
+sim time:56.0129, clock: 0.296894 src: 10.1.0.1 dest: 10.1.0.0
+sim time:56.0129, clock: 0.297081 src: 10.1.0.1 dest: 10.1.0.0
+sim time:57, event: send data.
+sim time:58, event: send data.
+sim time:58.0129, clock: 0.298204 src: 10.1.0.1 dest: 10.1.0.0
+sim time:58.0129, clock: 0.298398 src: 10.1.0.1 dest: 10.1.0.0
+sim time:58.0129, clock: 0.298621 src: 10.1.0.1 dest: 10.1.0.0
+sim time:58.0129, clock: 0.298824 src: 10.1.0.1 dest: 10.1.0.0
+sim time:58.0129, clock: 0.299011 src: 10.1.0.1 dest: 10.1.0.0
+sim time:58.0129, clock: 0.299197 src: 10.1.0.1 dest: 10.1.0.0
+sim time:58.0129, clock: 0.299382 src: 10.1.0.1 dest: 10.1.0.0
+sim time:58.0129, clock: 0.299603 src: 10.1.0.1 dest: 10.1.0.0
+sim time:58.0129, clock: 0.299796 src: 10.1.0.1 dest: 10.1.0.0
+sim time:58.0129, clock: 0.299983 src: 10.1.0.1 dest: 10.1.0.0
+sim time:59, event: send data.
+sim time:60, event: send data.
+sim time:60.0129, clock: 0.301059 src: 10.1.0.1 dest: 10.1.0.0
+sim time:60.0129, clock: 0.301253 src: 10.1.0.1 dest: 10.1.0.0
+sim time:60.0129, clock: 0.301441 src: 10.1.0.1 dest: 10.1.0.0
+sim time:60.0129, clock: 0.301681 src: 10.1.0.1 dest: 10.1.0.0
+sim time:60.0129, clock: 0.30187 src: 10.1.0.1 dest: 10.1.0.0
+sim time:60.0129, clock: 0.302056 src: 10.1.0.1 dest: 10.1.0.0
+sim time:60.0129, clock: 0.302242 src: 10.1.0.1 dest: 10.1.0.0
+sim time:60.0129, clock: 0.302429 src: 10.1.0.1 dest: 10.1.0.0
+sim time:60.0129, clock: 0.302655 src: 10.1.0.1 dest: 10.1.0.0
+sim time:60.0129, clock: 0.302843 src: 10.1.0.1 dest: 10.1.0.0
+sim time:61, event: send data.
+sim time:62, event: send data.
+sim time:62.0129, clock: 0.303901 src: 10.1.0.1 dest: 10.1.0.0
+sim time:62.0129, clock: 0.304096 src: 10.1.0.1 dest: 10.1.0.0
+sim time:62.0129, clock: 0.304285 src: 10.1.0.1 dest: 10.1.0.0
+sim time:62.0129, clock: 0.304499 src: 10.1.0.1 dest: 10.1.0.0
+sim time:62.0129, clock: 0.304701 src: 10.1.0.1 dest: 10.1.0.0
+sim time:62.0129, clock: 0.304891 src: 10.1.0.1 dest: 10.1.0.0
+sim time:62.0129, clock: 0.305079 src: 10.1.0.1 dest: 10.1.0.0
+sim time:62.0129, clock: 0.305267 src: 10.1.0.1 dest: 10.1.0.0
+sim time:62.0129, clock: 0.305492 src: 10.1.0.1 dest: 10.1.0.0
+sim time:62.0129, clock: 0.3057 src: 10.1.0.1 dest: 10.1.0.0
+sim time:63, event: send data.
+sim time:64, event: send data.
+sim time:64.0129, clock: 0.306878 src: 10.1.0.1 dest: 10.1.0.0
+sim time:64.0129, clock: 0.307072 src: 10.1.0.1 dest: 10.1.0.0
+sim time:64.0129, clock: 0.30726 src: 10.1.0.1 dest: 10.1.0.0
+sim time:64.0129, clock: 0.307471 src: 10.1.0.1 dest: 10.1.0.0
+sim time:64.0129, clock: 0.307674 src: 10.1.0.1 dest: 10.1.0.0
+sim time:64.0129, clock: 0.307862 src: 10.1.0.1 dest: 10.1.0.0
+sim time:64.0129, clock: 0.308048 src: 10.1.0.1 dest: 10.1.0.0
+sim time:64.0129, clock: 0.308234 src: 10.1.0.1 dest: 10.1.0.0
+sim time:64.0129, clock: 0.308421 src: 10.1.0.1 dest: 10.1.0.0
+sim time:64.0129, clock: 0.308646 src: 10.1.0.1 dest: 10.1.0.0
+sim time:65, event: send data.
+sim time:66, event: send data.
+sim time:66.0129, clock: 0.309721 src: 10.1.0.1 dest: 10.1.0.0
+sim time:66.0129, clock: 0.309917 src: 10.1.0.1 dest: 10.1.0.0
+sim time:66.0129, clock: 0.310106 src: 10.1.0.1 dest: 10.1.0.0
+sim time:66.0129, clock: 0.310292 src: 10.1.0.1 dest: 10.1.0.0
+sim time:66.0129, clock: 0.310507 src: 10.1.0.1 dest: 10.1.0.0
+sim time:66.0129, clock: 0.310706 src: 10.1.0.1 dest: 10.1.0.0
+sim time:66.0129, clock: 0.310894 src: 10.1.0.1 dest: 10.1.0.0
+sim time:66.0129, clock: 0.31108 src: 10.1.0.1 dest: 10.1.0.0
+sim time:66.0129, clock: 0.311267 src: 10.1.0.1 dest: 10.1.0.0
+sim time:66.0129, clock: 0.31148 src: 10.1.0.1 dest: 10.1.0.0
+sim time:67, event: send data.
+sim time:68, event: send data.
+sim time:68.0129, clock: 0.312558 src: 10.1.0.1 dest: 10.1.0.0
+sim time:68.0129, clock: 0.312754 src: 10.1.0.1 dest: 10.1.0.0
+sim time:68.0129, clock: 0.312941 src: 10.1.0.1 dest: 10.1.0.0
+sim time:68.0129, clock: 0.313127 src: 10.1.0.1 dest: 10.1.0.0
+sim time:68.0129, clock: 0.313312 src: 10.1.0.1 dest: 10.1.0.0
+sim time:68.0129, clock: 0.313544 src: 10.1.0.1 dest: 10.1.0.0
+sim time:68.0129, clock: 0.313741 src: 10.1.0.1 dest: 10.1.0.0
+sim time:68.0129, clock: 0.31393 src: 10.1.0.1 dest: 10.1.0.0
+sim time:68.0129, clock: 0.314117 src: 10.1.0.1 dest: 10.1.0.0
+sim time:68.0129, clock: 0.314304 src: 10.1.0.1 dest: 10.1.0.0
+sim time:69, event: send data.
+sim time:70, event: send data.
+sim time:70.0129, clock: 0.315353 src: 10.1.0.1 dest: 10.1.0.0
+sim time:70.0129, clock: 0.31558 src: 10.1.0.1 dest: 10.1.0.0
+sim time:70.0129, clock: 0.315783 src: 10.1.0.1 dest: 10.1.0.0
+sim time:70.0129, clock: 0.315971 src: 10.1.0.1 dest: 10.1.0.0
+sim time:70.0129, clock: 0.316157 src: 10.1.0.1 dest: 10.1.0.0
+sim time:70.0129, clock: 0.316343 src: 10.1.0.1 dest: 10.1.0.0
+sim time:70.0129, clock: 0.316564 src: 10.1.0.1 dest: 10.1.0.0
+sim time:70.0129, clock: 0.316756 src: 10.1.0.1 dest: 10.1.0.0
+sim time:70.0129, clock: 0.316943 src: 10.1.0.1 dest: 10.1.0.0
+sim time:70.0129, clock: 0.317131 src: 10.1.0.1 dest: 10.1.0.0
+sim time:71, event: send data.
+sim time:72, event: send data.
+sim time:72.0129, clock: 0.31822 src: 10.1.0.1 dest: 10.1.0.0
+sim time:72.0129, clock: 0.318441 src: 10.1.0.1 dest: 10.1.0.0
+sim time:72.0129, clock: 0.318668 src: 10.1.0.1 dest: 10.1.0.0
+sim time:72.0129, clock: 0.318867 src: 10.1.0.1 dest: 10.1.0.0
+sim time:72.0129, clock: 0.319083 src: 10.1.0.1 dest: 10.1.0.0
+sim time:72.0129, clock: 0.31931 src: 10.1.0.1 dest: 10.1.0.0
+sim time:72.0129, clock: 0.319595 src: 10.1.0.1 dest: 10.1.0.0
+sim time:72.0129, clock: 0.319852 src: 10.1.0.1 dest: 10.1.0.0
+sim time:72.0129, clock: 0.32008 src: 10.1.0.1 dest: 10.1.0.0
+sim time:72.0129, clock: 0.320346 src: 10.1.0.1 dest: 10.1.0.0
+sim time:73, event: send data.
+sim time:74, event: send data.
+sim time:74.0129, clock: 0.321494 src: 10.1.0.1 dest: 10.1.0.0
+sim time:74.0129, clock: 0.321695 src: 10.1.0.1 dest: 10.1.0.0
+sim time:74.0129, clock: 0.321886 src: 10.1.0.1 dest: 10.1.0.0
+sim time:74.0129, clock: 0.322072 src: 10.1.0.1 dest: 10.1.0.0
+sim time:74.0129, clock: 0.322258 src: 10.1.0.1 dest: 10.1.0.0
+sim time:74.0129, clock: 0.322485 src: 10.1.0.1 dest: 10.1.0.0
+sim time:74.0129, clock: 0.322684 src: 10.1.0.1 dest: 10.1.0.0
+sim time:74.0129, clock: 0.322872 src: 10.1.0.1 dest: 10.1.0.0
+sim time:74.0129, clock: 0.323059 src: 10.1.0.1 dest: 10.1.0.0
+sim time:74.0129, clock: 0.323246 src: 10.1.0.1 dest: 10.1.0.0
+sim time:75, event: send data.
+sim time:76, event: send data.
+sim time:76.0129, clock: 0.324325 src: 10.1.0.1 dest: 10.1.0.0
+sim time:76.0129, clock: 0.324551 src: 10.1.0.1 dest: 10.1.0.0
+sim time:76.0129, clock: 0.324743 src: 10.1.0.1 dest: 10.1.0.0
+sim time:76.0129, clock: 0.32493 src: 10.1.0.1 dest: 10.1.0.0
+sim time:76.0129, clock: 0.325115 src: 10.1.0.1 dest: 10.1.0.0
+sim time:76.0129, clock: 0.325301 src: 10.1.0.1 dest: 10.1.0.0
+sim time:76.0129, clock: 0.325538 src: 10.1.0.1 dest: 10.1.0.0
+sim time:76.0129, clock: 0.325732 src: 10.1.0.1 dest: 10.1.0.0
+sim time:76.0129, clock: 0.32592 src: 10.1.0.1 dest: 10.1.0.0
+sim time:76.0129, clock: 0.326107 src: 10.1.0.1 dest: 10.1.0.0
+sim time:77, event: send data.
+sim time:78, event: send data.
+sim time:78.0129, clock: 0.32715 src: 10.1.0.1 dest: 10.1.0.0
+sim time:78.0129, clock: 0.327344 src: 10.1.0.1 dest: 10.1.0.0
+sim time:78.0129, clock: 0.327615 src: 10.1.0.1 dest: 10.1.0.0
+sim time:78.0129, clock: 0.327807 src: 10.1.0.1 dest: 10.1.0.0
+sim time:78.0129, clock: 0.327994 src: 10.1.0.1 dest: 10.1.0.0
+sim time:78.0129, clock: 0.32818 src: 10.1.0.1 dest: 10.1.0.0
+sim time:78.0129, clock: 0.328384 src: 10.1.0.1 dest: 10.1.0.0
+sim time:78.0129, clock: 0.32859 src: 10.1.0.1 dest: 10.1.0.0
+sim time:78.0129, clock: 0.328778 src: 10.1.0.1 dest: 10.1.0.0
+sim time:78.0129, clock: 0.328965 src: 10.1.0.1 dest: 10.1.0.0
+sim time:79, event: send data.
+sim time:80, event: send data.
+sim time:80.0129, clock: 0.33006 src: 10.1.0.1 dest: 10.1.0.0
+sim time:80.0129, clock: 0.330253 src: 10.1.0.1 dest: 10.1.0.0
+sim time:80.0129, clock: 0.33047 src: 10.1.0.1 dest: 10.1.0.0
+sim time:80.0129, clock: 0.330666 src: 10.1.0.1 dest: 10.1.0.0
+sim time:80.0129, clock: 0.330855 src: 10.1.0.1 dest: 10.1.0.0
+sim time:80.0129, clock: 0.331041 src: 10.1.0.1 dest: 10.1.0.0
+sim time:80.0129, clock: 0.331226 src: 10.1.0.1 dest: 10.1.0.0
+sim time:80.0129, clock: 0.331441 src: 10.1.0.1 dest: 10.1.0.0
+sim time:80.0129, clock: 0.331638 src: 10.1.0.1 dest: 10.1.0.0
+sim time:80.0129, clock: 0.331826 src: 10.1.0.1 dest: 10.1.0.0
+sim time:81, event: send data.
+sim time:82, event: send data.
+sim time:82.0129, clock: 0.332877 src: 10.1.0.1 dest: 10.1.0.0
+sim time:82.0129, clock: 0.33307 src: 10.1.0.1 dest: 10.1.0.0
+sim time:82.0129, clock: 0.333269 src: 10.1.0.1 dest: 10.1.0.0
+sim time:82.0129, clock: 0.333506 src: 10.1.0.1 dest: 10.1.0.0
+sim time:82.0129, clock: 0.3337 src: 10.1.0.1 dest: 10.1.0.0
+sim time:82.0129, clock: 0.333887 src: 10.1.0.1 dest: 10.1.0.0
+sim time:82.0129, clock: 0.334073 src: 10.1.0.1 dest: 10.1.0.0
+sim time:82.0129, clock: 0.334258 src: 10.1.0.1 dest: 10.1.0.0
+sim time:82.0129, clock: 0.334481 src: 10.1.0.1 dest: 10.1.0.0
+sim time:82.0129, clock: 0.334674 src: 10.1.0.1 dest: 10.1.0.0
+sim time:83, event: send data.
+sim time:84, event: send data.
+sim time:84.0129, clock: 0.335765 src: 10.1.0.1 dest: 10.1.0.0
+sim time:84.0129, clock: 0.335959 src: 10.1.0.1 dest: 10.1.0.0
+sim time:84.0129, clock: 0.336146 src: 10.1.0.1 dest: 10.1.0.0
+sim time:84.0129, clock: 0.336349 src: 10.1.0.1 dest: 10.1.0.0
+sim time:84.0129, clock: 0.336559 src: 10.1.0.1 dest: 10.1.0.0
+sim time:84.0129, clock: 0.336747 src: 10.1.0.1 dest: 10.1.0.0
+sim time:84.0129, clock: 0.336933 src: 10.1.0.1 dest: 10.1.0.0
+sim time:84.0129, clock: 0.337119 src: 10.1.0.1 dest: 10.1.0.0
+sim time:84.0129, clock: 0.337305 src: 10.1.0.1 dest: 10.1.0.0
+sim time:84.0129, clock: 0.337542 src: 10.1.0.1 dest: 10.1.0.0
+sim time:85, event: send data.
+sim time:86, event: send data.
+sim time:86.0129, clock: 0.338604 src: 10.1.0.1 dest: 10.1.0.0
+sim time:86.0129, clock: 0.338798 src: 10.1.0.1 dest: 10.1.0.0
+sim time:86.0129, clock: 0.338998 src: 10.1.0.1 dest: 10.1.0.0
+sim time:86.0129, clock: 0.339191 src: 10.1.0.1 dest: 10.1.0.0
+sim time:86.0129, clock: 0.339408 src: 10.1.0.1 dest: 10.1.0.0
+sim time:86.0129, clock: 0.339607 src: 10.1.0.1 dest: 10.1.0.0
+sim time:86.0129, clock: 0.339795 src: 10.1.0.1 dest: 10.1.0.0
+sim time:86.0129, clock: 0.339982 src: 10.1.0.1 dest: 10.1.0.0
+sim time:86.0129, clock: 0.340169 src: 10.1.0.1 dest: 10.1.0.0
+sim time:86.0129, clock: 0.340383 src: 10.1.0.1 dest: 10.1.0.0
+sim time:87, event: send data.
+sim time:88, event: send data.
+sim time:88.0129, clock: 0.341479 src: 10.1.0.1 dest: 10.1.0.0
+sim time:88.0129, clock: 0.341676 src: 10.1.0.1 dest: 10.1.0.0
+sim time:88.0129, clock: 0.341864 src: 10.1.0.1 dest: 10.1.0.0
+sim time:88.0129, clock: 0.34205 src: 10.1.0.1 dest: 10.1.0.0
+sim time:88.0129, clock: 0.342236 src: 10.1.0.1 dest: 10.1.0.0
+sim time:88.0129, clock: 0.342457 src: 10.1.0.1 dest: 10.1.0.0
+sim time:88.0129, clock: 0.34265 src: 10.1.0.1 dest: 10.1.0.0
+sim time:88.0129, clock: 0.342837 src: 10.1.0.1 dest: 10.1.0.0
+sim time:88.0129, clock: 0.343024 src: 10.1.0.1 dest: 10.1.0.0
+sim time:88.0129, clock: 0.343211 src: 10.1.0.1 dest: 10.1.0.0
+sim time:89, event: send data.
+sim time:90, event: send data.
+sim time:90.0129, clock: 0.344262 src: 10.1.0.1 dest: 10.1.0.0
+sim time:90.0129, clock: 0.344491 src: 10.1.0.1 dest: 10.1.0.0
+sim time:90.0129, clock: 0.344679 src: 10.1.0.1 dest: 10.1.0.0
+sim time:90.0129, clock: 0.344865 src: 10.1.0.1 dest: 10.1.0.0
+sim time:90.0129, clock: 0.345052 src: 10.1.0.1 dest: 10.1.0.0
+sim time:90.0129, clock: 0.345238 src: 10.1.0.1 dest: 10.1.0.0
+sim time:90.0129, clock: 0.345477 src: 10.1.0.1 dest: 10.1.0.0
+sim time:90.0129, clock: 0.345668 src: 10.1.0.1 dest: 10.1.0.0
+sim time:90.0129, clock: 0.345922 src: 10.1.0.1 dest: 10.1.0.0
+sim time:90.0129, clock: 0.346161 src: 10.1.0.1 dest: 10.1.0.0
+sim time:91, event: send data.
+sim time:92, event: send data.
+sim time:92.0129, clock: 0.347465 src: 10.1.0.1 dest: 10.1.0.0
+sim time:92.0129, clock: 0.347691 src: 10.1.0.1 dest: 10.1.0.0
+sim time:92.0129, clock: 0.347941 src: 10.1.0.1 dest: 10.1.0.0
+sim time:92.0129, clock: 0.348191 src: 10.1.0.1 dest: 10.1.0.0
+sim time:92.0129, clock: 0.348458 src: 10.1.0.1 dest: 10.1.0.0
+sim time:92.0129, clock: 0.348657 src: 10.1.0.1 dest: 10.1.0.0
+sim time:92.0129, clock: 0.348843 src: 10.1.0.1 dest: 10.1.0.0
+sim time:92.0129, clock: 0.34903 src: 10.1.0.1 dest: 10.1.0.0
+sim time:92.0129, clock: 0.349217 src: 10.1.0.1 dest: 10.1.0.0
+sim time:92.0129, clock: 0.349454 src: 10.1.0.1 dest: 10.1.0.0
+sim time:93, event: send data.
+sim time:94, event: send data.
+sim time:94.0129, clock: 0.350547 src: 10.1.0.1 dest: 10.1.0.0
+sim time:94.0129, clock: 0.350755 src: 10.1.0.1 dest: 10.1.0.0
+sim time:94.0129, clock: 0.350944 src: 10.1.0.1 dest: 10.1.0.0
+sim time:94.0129, clock: 0.351132 src: 10.1.0.1 dest: 10.1.0.0
+sim time:94.0129, clock: 0.351347 src: 10.1.0.1 dest: 10.1.0.0
+sim time:94.0129, clock: 0.351547 src: 10.1.0.1 dest: 10.1.0.0
+sim time:94.0129, clock: 0.351736 src: 10.1.0.1 dest: 10.1.0.0
+sim time:94.0129, clock: 0.351924 src: 10.1.0.1 dest: 10.1.0.0
+sim time:94.0129, clock: 0.352112 src: 10.1.0.1 dest: 10.1.0.0
+sim time:94.0129, clock: 0.352324 src: 10.1.0.1 dest: 10.1.0.0
+sim time:95, event: send data.
+sim time:96, event: send data.
+sim time:96.0129, clock: 0.353411 src: 10.1.0.1 dest: 10.1.0.0
+sim time:96.0129, clock: 0.35361 src: 10.1.0.1 dest: 10.1.0.0
+sim time:96.0129, clock: 0.353798 src: 10.1.0.1 dest: 10.1.0.0
+sim time:96.0129, clock: 0.353984 src: 10.1.0.1 dest: 10.1.0.0
+sim time:96.0129, clock: 0.354171 src: 10.1.0.1 dest: 10.1.0.0
+sim time:96.0129, clock: 0.354386 src: 10.1.0.1 dest: 10.1.0.0
+sim time:96.0129, clock: 0.354583 src: 10.1.0.1 dest: 10.1.0.0
+sim time:96.0129, clock: 0.35477 src: 10.1.0.1 dest: 10.1.0.0
+sim time:96.0129, clock: 0.354956 src: 10.1.0.1 dest: 10.1.0.0
+sim time:96.0129, clock: 0.355142 src: 10.1.0.1 dest: 10.1.0.0
+sim time:97, event: send data.
+sim time:98, event: send data.
+sim time:98.0129, clock: 0.35621 src: 10.1.0.1 dest: 10.1.0.0
+sim time:98.0129, clock: 0.356437 src: 10.1.0.1 dest: 10.1.0.0
+sim time:98.0129, clock: 0.35663 src: 10.1.0.1 dest: 10.1.0.0
+sim time:98.0129, clock: 0.356817 src: 10.1.0.1 dest: 10.1.0.0
+sim time:98.0129, clock: 0.357004 src: 10.1.0.1 dest: 10.1.0.0
+sim time:98.0129, clock: 0.35719 src: 10.1.0.1 dest: 10.1.0.0
+sim time:98.0129, clock: 0.357427 src: 10.1.0.1 dest: 10.1.0.0
+sim time:98.0129, clock: 0.35762 src: 10.1.0.1 dest: 10.1.0.0
+sim time:98.0129, clock: 0.357808 src: 10.1.0.1 dest: 10.1.0.0
+sim time:98.0129, clock: 0.357995 src: 10.1.0.1 dest: 10.1.0.0
+sim time:99, event: send data.
+sim time:100, event: send data.
+sim time:100.013, clock: 0.359103 src: 10.1.0.1 dest: 10.1.0.0
+sim time:100.013, clock: 0.359325 src: 10.1.0.1 dest: 10.1.0.0
+sim time:100.013, clock: 0.359524 src: 10.1.0.1 dest: 10.1.0.0
+sim time:100.013, clock: 0.359712 src: 10.1.0.1 dest: 10.1.0.0
+sim time:100.013, clock: 0.359897 src: 10.1.0.1 dest: 10.1.0.0
+sim time:100.013, clock: 0.360082 src: 10.1.0.1 dest: 10.1.0.0
+sim time:100.013, clock: 0.360288 src: 10.1.0.1 dest: 10.1.0.0
+sim time:100.013, clock: 0.360492 src: 10.1.0.1 dest: 10.1.0.0
+sim time:100.013, clock: 0.36068 src: 10.1.0.1 dest: 10.1.0.0
+sim time:100.013, clock: 0.360867 src: 10.1.0.1 dest: 10.1.0.0
+sim time:101, event: send data.
+sim time:102, event: send data.
+sim time:102.013, clock: 0.362048 src: 10.1.0.1 dest: 10.1.0.0
+sim time:102.013, clock: 0.362318 src: 10.1.0.1 dest: 10.1.0.0
+sim time:102.013, clock: 0.362566 src: 10.1.0.1 dest: 10.1.0.0
+sim time:102.013, clock: 0.362817 src: 10.1.0.1 dest: 10.1.0.0
+sim time:102.013, clock: 0.363068 src: 10.1.0.1 dest: 10.1.0.0
+sim time:102.013, clock: 0.363319 src: 10.1.0.1 dest: 10.1.0.0
+sim time:102.013, clock: 0.363518 src: 10.1.0.1 dest: 10.1.0.0
+sim time:102.013, clock: 0.363707 src: 10.1.0.1 dest: 10.1.0.0
+sim time:102.013, clock: 0.363894 src: 10.1.0.1 dest: 10.1.0.0
+sim time:102.013, clock: 0.36408 src: 10.1.0.1 dest: 10.1.0.0
+sim time:103, event: send data.
+sim time:104, event: send data.
+sim time:104.013, clock: 0.365145 src: 10.1.0.1 dest: 10.1.0.0
+sim time:104.013, clock: 0.365389 src: 10.1.0.1 dest: 10.1.0.0
+sim time:104.013, clock: 0.365584 src: 10.1.0.1 dest: 10.1.0.0
+sim time:104.013, clock: 0.365772 src: 10.1.0.1 dest: 10.1.0.0
+sim time:104.013, clock: 0.365958 src: 10.1.0.1 dest: 10.1.0.0
+sim time:104.013, clock: 0.366143 src: 10.1.0.1 dest: 10.1.0.0
+sim time:104.013, clock: 0.366365 src: 10.1.0.1 dest: 10.1.0.0
+sim time:104.013, clock: 0.366558 src: 10.1.0.1 dest: 10.1.0.0
+sim time:104.013, clock: 0.366745 src: 10.1.0.1 dest: 10.1.0.0
+sim time:104.013, clock: 0.366932 src: 10.1.0.1 dest: 10.1.0.0
+sim time:105, event: send data.
+sim time:106, event: send data.
+sim time:106.013, clock: 0.368032 src: 10.1.0.1 dest: 10.1.0.0
+sim time:106.013, clock: 0.368258 src: 10.1.0.1 dest: 10.1.0.0
+sim time:106.013, clock: 0.368459 src: 10.1.0.1 dest: 10.1.0.0
+sim time:106.013, clock: 0.368648 src: 10.1.0.1 dest: 10.1.0.0
+sim time:106.013, clock: 0.368835 src: 10.1.0.1 dest: 10.1.0.0
+sim time:106.013, clock: 0.369022 src: 10.1.0.1 dest: 10.1.0.0
+sim time:106.013, clock: 0.369241 src: 10.1.0.1 dest: 10.1.0.0
+sim time:106.013, clock: 0.369448 src: 10.1.0.1 dest: 10.1.0.0
+sim time:106.013, clock: 0.369638 src: 10.1.0.1 dest: 10.1.0.0
+sim time:106.013, clock: 0.369826 src: 10.1.0.1 dest: 10.1.0.0
+sim time:107, event: send data.
+sim time:108, event: send data.
+sim time:108.013, clock: 0.370898 src: 10.1.0.1 dest: 10.1.0.0
+sim time:108.013, clock: 0.371091 src: 10.1.0.1 dest: 10.1.0.0
+sim time:108.013, clock: 0.37131 src: 10.1.0.1 dest: 10.1.0.0
+sim time:108.013, clock: 0.371509 src: 10.1.0.1 dest: 10.1.0.0
+sim time:108.013, clock: 0.371698 src: 10.1.0.1 dest: 10.1.0.0
+sim time:108.013, clock: 0.371885 src: 10.1.0.1 dest: 10.1.0.0
+sim time:108.013, clock: 0.372071 src: 10.1.0.1 dest: 10.1.0.0
+sim time:108.013, clock: 0.372297 src: 10.1.0.1 dest: 10.1.0.0
+sim time:108.013, clock: 0.372498 src: 10.1.0.1 dest: 10.1.0.0
+sim time:108.013, clock: 0.372688 src: 10.1.0.1 dest: 10.1.0.0
+sim time:109, event: send data.
+packet count: 550
