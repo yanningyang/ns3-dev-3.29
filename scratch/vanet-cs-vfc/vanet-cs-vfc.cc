@@ -242,7 +242,7 @@ VanetCsVfcExperiment::ConfigureDevices ()
   // which is used to determine the total amount of
   // data transmitted, and then used to calculate
   // the MAC/PHY overhead beyond the app-data								// get the raw pointer
-  Config::Connect ("/NodeList/*/DeviceList/*/Phy/State/Tx", MakeCallback (&WifiPhyStats::PhyTxTrace, m_wifiPhyStats));
+  Config::Connect ("/NodeList/*/DeviceList/*/Phy/State/Tx", MakeCallback (&WifiPhyStats::PhyTxTrace, m_wifiPhyStats)); // @suppress("Invalid arguments")
   // TxDrop, RxDrop not working yet.  Not sure what I'm doing wrong.
 //  Config::Connect ("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Phy/PhyTxDrop", MakeCallback (&WifiPhyStats::PhyTxDrop, m_wifiPhyStats));
 //  Config::Connect ("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Phy/PhyRxDrop", MakeCallback (&WifiPhyStats::PhyRxDrop, m_wifiPhyStats));
