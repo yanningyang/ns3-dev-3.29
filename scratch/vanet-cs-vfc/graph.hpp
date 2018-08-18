@@ -341,7 +341,7 @@ vector<vector<V>> GraphMatrix<V>::getCliques(uint32_t nClique)
   GraphMatrix<V> graphCopy = *this;
   vector<vector<V>> cliques;
 
-  for (uint32_t i = 0; i < nClique && !isEmpty(); i++)
+  for (uint32_t i = 0; i < nClique && !graphCopy.isEmpty(); i++)
     {
       vector<V> clique;
       GraphMatrix<V> complement = graphCopy.getComplement();

@@ -24,6 +24,11 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("ScratchSimulator");
 
+void test()
+{
+  cout << Now().GetDouble() << endl;
+}
+
 int 
 main (int argc, char *argv[])
 {
@@ -94,17 +99,23 @@ main (int argc, char *argv[])
   }
 #endif
 
-  std::map<uint32_t, uint32_t> haha;
-  for (uint32_t i = 0; i < 10; i++)
-    {
-      haha.insert(make_pair(i, i * i));
-    }
+//  std::map<uint32_t, uint32_t> haha;
+//  for (uint32_t i = 0; i < 10; i++)
+//    {
+//      haha.insert(make_pair(i, i * i));
+//    }
+//
+//  std::map<uint32_t, uint32_t>::iterator iter = haha.begin();
+//  for (; iter != haha.end(); iter++)
+//    {
+//      cout << iter->first << "=" << iter->second << endl;
+//    }
 
-  std::map<uint32_t, uint32_t>::iterator iter = haha.begin();
-  for (; iter != haha.end(); iter++)
-    {
-      cout << iter->first << "=" << iter->second << endl;
-    }
+  Simulator::Schedule(Seconds(1), &test);
+  cout << Seconds(1).GetDouble() << endl;
+  cout << Time(1.0).GetDouble() << endl;
 
-  cout << Seconds(1).GetDouble() / 1e+6 << endl;
+  Simulator::Stop(Seconds(10));
+  Simulator::Run();
+  Simulator::Destroy();
 }

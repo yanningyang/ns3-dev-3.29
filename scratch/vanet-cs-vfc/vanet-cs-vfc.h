@@ -58,8 +58,10 @@ NS_LOG_COMPONENT_DEFINE ("vanet-cs-vfc");
 #define Total_Time_Spent_stas 					true
 #define Construct_Graph_And_Find_Clique_Time_stas 		false
 #define Device_Transmission_Range 				450
-#define Gloabal_DB_Size 					50
-#define Num_Cliques 						1
+#define Gloabal_DB_Size 					20
+#define Num_Cliques 						2
+#define Packet_Size 						1024
+#define Total_Sim_Time 						581.01
 
 /**
  * This simulation is to show the routing service of WaveNetDevice described in IEEE 09.4.
@@ -370,7 +372,6 @@ private:
   std::map<uint32_t, uint32_t> vehIdx2FogIdxMap;
 
   std::map<uint32_t, uint32_t> fogId2FogIdxMap;
-//  std::map<uint32_t, uint32_t> fogIdx2FogReqInCliqueMap;
   std::map<uint32_t, std::map<uint32_t, uint32_t>> fogIdx2FogReqInCliqueMaps;
   std::vector<std::set<uint32_t>> fogCluster; /// vehicles set for every fog node in the cloud, Updated when receive a packet from vehicle
   std::vector<std::set<uint32_t>> fogsReqs; /// fogs node request set in the cloud, Updated when receive a packet from vehicle
@@ -391,7 +392,6 @@ private:
   std::vector<std::vector<VertexNode>> cliques;
   uint32_t currentBroadcastId;
   std::map<uint32_t, std::vector<VertexNode>> broadcastId2cliqueMap;
-//  std::vector<std::set<uint32_t>> datasNeededForDecoding;
   std::vector<std::map<uint32_t, std::set<uint32_t>>> datasNeededForDecodingPerClique;
 
   uint32_t receive_count;

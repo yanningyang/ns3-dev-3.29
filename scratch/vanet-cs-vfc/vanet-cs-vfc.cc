@@ -9,30 +9,6 @@
 
 using namespace ns3;
 
-//std::vector<uint32_t> VanetCsVfcExperiment::globalDB;
-//std::map<uint32_t, uint32_t> VanetCsVfcExperiment::vehId2IndexMap;
-//std::vector<bool> VanetCsVfcExperiment::vehsEnterFlag;
-//std::vector<std::set<uint32_t>> VanetCsVfcExperiment::vehsReqs;
-//std::vector<std::set<uint32_t>> VanetCsVfcExperiment::vehsCaches;
-//std::vector<std::map<uint32_t, RequestStas>> VanetCsVfcExperiment::vehsReqsStas;
-//std::map<uint32_t, uint32_t> VanetCsVfcExperiment::vehIdx2FogIdxMap;
-//std::vector<std::set<uint32_t>> VanetCsVfcExperiment::fogCluster;
-//std::vector<std::set<uint32_t>> VanetCsVfcExperiment::fogsReqs;
-//std::vector<std::set<uint32_t>> VanetCsVfcExperiment::fogsCaches;
-//
-//std::vector<std::set<uint32_t>> VanetCsVfcExperiment::vehsReqsInCloud;
-//std::vector<std::set<uint32_t>> VanetCsVfcExperiment::vehsCachesInCloud;
-//std::vector<std::map<uint32_t, RequestStas>> VanetCsVfcExperiment::vehsReqsStasInCloud;
-//std::vector<ns3::Vector3D> VanetCsVfcExperiment::vehsMobInfoInCloud;
-//
-//uint32_t VanetCsVfcExperiment::receive_count = 0;
-
-//std::map<uint32_t, std::set<uint32_t>> VanetCsVfcExperiment::vehsReqs;
-//std::map<uint32_t, std::set<uint32_t>> VanetCsVfcExperiment::vehsCaches;
-//std::map<uint32_t, std::set<uint32_t>> VanetCsVfcExperiment::fogCluster;
-//std::map<uint32_t, std::set<uint32_t>> VanetCsVfcExperiment::fogsReqs;
-//std::map<uint32_t, std::set<uint32_t>> VanetCsVfcExperiment::fogsCaches;
-
 VanetCsVfcExperiment::VanetCsVfcExperiment ():
     m_protocol (0),
     m_dlPort (1000),
@@ -59,7 +35,7 @@ VanetCsVfcExperiment::VanetCsVfcExperiment ():
     m_trName (m_workspacePath + "/vanet-cs-vfc.mob"),
     m_animFile (m_workspacePath + "/vanet-cs-vfc-animation.xml"),
     m_log (1),
-    m_TotalSimTime (361.01),
+    m_TotalSimTime (Total_Sim_Time),
     m_rate ("2048bps"),
     m_wavePacketSize (200),
     m_nonSafetySize (1500),
@@ -399,7 +375,7 @@ VanetCsVfcExperiment::RunSimulation ()
   std::cout << "SubmittedReqs: " << m_requestStats.GetSubmittedReqs() << std::endl;
   std::cout << "SatisfiedReqs: " << m_requestStats.GetSatisfiedReqs() << std::endl;
   std::cout << "BroadcastPkts: " << m_requestStats.GetBroadcastPkts() << std::endl;
-  std::cout << "BroadcastPkts: " << m_requestStats.GetCumulativeDelay() << std::endl;
+  std::cout << "CumulativeDelay: " << m_requestStats.GetCumulativeDelay() << std::endl;
   std::cout << "ASD: " << (m_requestStats.GetCumulativeDelay() / 1e+6) / m_requestStats.GetSatisfiedReqs() << "ms" << std::endl;
   std::cout << "SR: " << (double)m_requestStats.GetSatisfiedReqs() / m_requestStats.GetSubmittedReqs() << std::endl;
   std::cout << "BE: " << m_requestStats.GetSatisfiedReqs() / m_requestStats.GetBroadcastPkts() << std::endl;
@@ -780,9 +756,9 @@ VanetCsVfcExperiment::ConstructGraphAndBroadcast ()
 #endif
 
   // broadcast clique to vehicles
+  broadcastId2cliqueMap.clear();
   for (std::vector<VertexNode> clique : cliques)
     {
-      broadcastId2cliqueMap.clear();
       currentBroadcastId++;
       broadcastId2cliqueMap.insert(make_pair(currentBroadcastId, clique));
     }
@@ -809,6 +785,7 @@ VanetCsVfcExperiment::ConstructGraphAndBroadcast ()
       Ptr<UdpSender> sender = CreateObject<UdpSender>();
       sender->SetNode(m_remoteHost);
       sender->SetRemote(Ipv4Address ("10.2.255.255"), m_dlPort);
+      sender->SetDataSize(Packet_Size);
       sender->Start();
       using vanet::PacketHeader;
       PacketHeader header;
@@ -921,6 +898,7 @@ VanetCsVfcExperiment::Decode (bool isEncoded, uint32_t broadcastId)
 				  Ptr<UdpSender> sender = CreateObject<UdpSender>();
 				  sender->SetNode(m_obuNodes.Get(obuIdx1));
 				  sender->SetRemote(m_rsu80211pInterfaces.GetAddress(vertex.fogIndex), m_v2IPort);
+				  sender->SetDataSize(Packet_Size);
 				  sender->Start();
 				  using vanet::PacketHeader;
 				  PacketHeader header;
@@ -978,6 +956,7 @@ VanetCsVfcExperiment::Decode (bool isEncoded, uint32_t broadcastId)
 				    Ptr<UdpSender> sender = CreateObject<UdpSender>();
 				    sender->SetNode(m_obuNodes.Get(obuIdx));
 				    sender->SetRemote(m_rsu80211pInterfaces.GetAddress(k), m_v2IPort);
+				    sender->SetDataSize(Packet_Size);
 				    sender->Start();
 				    using vanet::PacketHeader;
 				    PacketHeader header;
@@ -1020,6 +999,7 @@ VanetCsVfcExperiment::Decode (bool isEncoded, uint32_t broadcastId)
 			    Ptr<UdpSender> sender = CreateObject<UdpSender>();
 			    sender->SetNode(m_obuNodes.Get(obuIdx));
 			    sender->SetRemote(m_rsu80211pInterfaces.GetAddress(vertex1.fogIndex), m_v2IPort);
+			    sender->SetDataSize(Packet_Size);
 			    sender->Start();
 			    using vanet::PacketHeader;
 			    PacketHeader header;
@@ -1053,6 +1033,7 @@ VanetCsVfcExperiment::Decode (bool isEncoded, uint32_t broadcastId)
 			    Ptr<UdpSender> sender = CreateObject<UdpSender>();
 			    sender->SetNode(m_obuNodes.Get(obuIdx));
 			    sender->SetRemote(m_rsu80211pInterfaces.GetAddress(vertex2.fogIndex), m_v2IPort);
+			    sender->SetDataSize(Packet_Size);
 			    sender->Start();
 			    using vanet::PacketHeader;
 			    PacketHeader header;
@@ -1089,6 +1070,7 @@ VanetCsVfcExperiment::Decode (bool isEncoded, uint32_t broadcastId)
 			    Ptr<UdpSender> sender = CreateObject<UdpSender>();
 			    sender->SetNode(m_obuNodes.Get(obuIdx));
 			    sender->SetRemote(m_rsu80211pInterfaces.GetAddress(vertex1.fogIndex), m_v2IPort);
+			    sender->SetDataSize(Packet_Size);
 			    sender->Start();
 			    using vanet::PacketHeader;
 			    PacketHeader header;
@@ -1125,6 +1107,7 @@ VanetCsVfcExperiment::Decode (bool isEncoded, uint32_t broadcastId)
 			    Ptr<UdpSender> sender = CreateObject<UdpSender>();
 			    sender->SetNode(m_obuNodes.Get(obuIdx));
 			    sender->SetRemote(m_rsu80211pInterfaces.GetAddress(vertex2.fogIndex), m_v2IPort);
+			    sender->SetDataSize(Packet_Size);
 			    sender->Start();
 			    using vanet::PacketHeader;
 			    PacketHeader header;
@@ -1546,6 +1529,7 @@ VanetCsVfcExperiment::SetupMessages ()
   Ptr<UdpSender> sender = CreateObject<UdpSender>();
   sender->SetNode(m_remoteHost);
   sender->SetRemote(Ipv4Address ("10.2.255.255"), m_dlPort);
+  sender->SetDataSize(Packet_Size);
   sender->Start();
   using vanet::PacketHeader;
   PacketHeader header;
@@ -1603,6 +1587,8 @@ VanetCsVfcExperiment::ReceivePacket (Ptr<Socket> socket)
 void
 VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Packet> packet, const Address & srcAddr, const Address & destAddr)
 {
+  receive_count++;
+
   size_t start = context.find("/", 0);
   start = context.find("/", start + 1);
   size_t end = context.find("/", start + 1);
@@ -1630,6 +1616,9 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
   PacketHeader recvHeader;
   Ptr<Packet> pktCopy = packet->Copy();
   pktCopy->RemoveHeader(recvHeader);
+
+  oss << " bId: " << recvHeader.GetBroadcastId();
+
   if (recvHeader.GetType() == PacketHeader::MessageType::REQUEST)
     {
       uint32_t pktSize = pktCopy->GetSize();
@@ -1674,8 +1663,6 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
     }
   else if (recvHeader.GetType() == PacketHeader::MessageType::DATA_C2V)
     {
-//      receive_count++;
-
       using vanet::PacketTagC2v;
       PacketTagC2v pktTagC2v;
       pktCopy->RemovePacketTag(pktTagC2v);
@@ -1709,7 +1696,6 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
     }
   else if (recvHeader.GetType() == PacketHeader::MessageType::DATA_V2F)
     {
-      receive_count++;
       using vanet::PacketTagV2f;
       PacketTagV2f pktTagV2f;
       pktCopy->RemovePacketTag(pktTagV2f);
@@ -1728,6 +1714,7 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
 	      Ptr<UdpSender> sender = CreateObject<UdpSender>();
 	      sender->SetNode(NodeList::GetNode(nodeId));
 	      sender->SetRemote(Ipv4Address("10.3.255.255"), m_i2VPort);
+	      sender->SetDataSize(Packet_Size);
 	      sender->Start();
 	      using vanet::PacketHeader;
 	      PacketHeader header;
@@ -1753,6 +1740,7 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
 	      Ptr<UdpSender> sender = CreateObject<UdpSender>();
 	      sender->SetNode(NodeList::GetNode(nodeId));
 	      sender->SetRemote(m_rsuCsmaInterfaces.GetAddress(rsuIdx), m_i2IPort);
+	      sender->SetDataSize(Packet_Size);
 	      sender->Start();
 	      using vanet::PacketHeader;
 	      PacketHeader header;
@@ -1775,6 +1763,7 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
 	  Ptr<UdpSender> sender = CreateObject<UdpSender>();
 	  sender->SetNode(NodeList::GetNode(nodeId));
 	  sender->SetRemote(Ipv4Address("10.3.255.255"), m_i2VPort);
+	  sender->SetDataSize(Packet_Size);
 	  sender->Start();
 	  using vanet::PacketHeader;
 	  PacketHeader header;
@@ -1799,6 +1788,7 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
 	      Ptr<UdpSender> sender = CreateObject<UdpSender>();
 	      sender->SetNode(NodeList::GetNode(nodeId));
 	      sender->SetRemote(Ipv4Address("10.3.255.255"), m_i2VPort);
+	      sender->SetDataSize(Packet_Size);
 	      sender->Start();
 	      using vanet::PacketHeader;
 	      PacketHeader header;
@@ -1825,7 +1815,6 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
     }
   else if (recvHeader.GetType() == PacketHeader::MessageType::DATA_F2F)
     {
-      receive_count++;
       using vanet::PacketTagF2f;
       PacketTagF2f pktTagF2f;
       pktCopy->RemovePacketTag(pktTagF2f);
@@ -1841,6 +1830,7 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
 	  Ptr<UdpSender> sender = CreateObject<UdpSender>();
 	  sender->SetNode(NodeList::GetNode(nodeId));
 	  sender->SetRemote(Ipv4Address ("10.3.255.255"), m_i2VPort);
+	  sender->SetDataSize(Packet_Size);
 	  sender->Start();
 	  using vanet::PacketHeader;
 	  PacketHeader header;
@@ -1862,6 +1852,7 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
 	  Ptr<UdpSender> sender = CreateObject<UdpSender>();
 	  sender->SetNode(NodeList::GetNode(nodeId));
 	  sender->SetRemote(Ipv4Address ("10.3.255.255"), m_i2VPort);
+	  sender->SetDataSize(Packet_Size);
 	  sender->Start();
 	  using vanet::PacketHeader;
 	  PacketHeader header;
@@ -1881,7 +1872,6 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
     }
   else if (recvHeader.GetType() == PacketHeader::MessageType::DATA_F2V)
     {
-      receive_count++;
       using vanet::PacketTagF2v;
       PacketTagF2v pktTagF2v;
       pktCopy->RemovePacketTag(pktTagF2v);
@@ -2054,6 +2044,7 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
 		      Ptr<UdpSender> sender = CreateObject<UdpSender>();
 		      sender->SetNode(NodeList::GetNode(nodeId));
 		      sender->SetRemote(m_rsu80211pInterfaces.GetAddress(fogIdx), m_v2IPort);
+		      sender->SetDataSize(Packet_Size);
 		      sender->Start();
 		      using vanet::PacketHeader;
 		      PacketHeader header;
