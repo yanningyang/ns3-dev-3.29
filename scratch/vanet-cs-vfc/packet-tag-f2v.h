@@ -19,11 +19,10 @@ class PacketTagF2v : public Tag
 {
 public:
 
-  enum class PreActionType:uint8_t
+  enum class NextActionType:uint8_t
   {
     NOT_SET	= 0,
-    F2F		= 1,
-    V2F		= 2
+    V2F		= 1
   };
 
   PacketTagF2v (void);
@@ -31,8 +30,8 @@ public:
   void SetCurrentEdgeType (EdgeType type);
   EdgeType GetCurrentEdgeType (void) const;
 
-  void SetPreActionType (PacketTagF2v::PreActionType type);
-  PacketTagF2v::PreActionType GetPreActionType (void) const;
+  void SetNextActionType (PacketTagF2v::NextActionType type);
+  PacketTagF2v::NextActionType GetNextActionType (void) const;
 
   void SetFogId(uint32_t fogId);
   uint32_t GetFogId(void);
@@ -52,7 +51,7 @@ public:
 
 private:
   uint8_t m_currentEdgeType;
-  uint8_t m_preActionType; // previous action type
+  uint8_t m_nextActionType; // next action type
   uint32_t m_fogId;
   std::vector<uint32_t> m_rsuWaitingServedIdxs; // index of rsu waiting to be served
   std::vector<uint32_t> m_dataIdxs;

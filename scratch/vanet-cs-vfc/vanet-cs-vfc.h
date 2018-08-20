@@ -25,6 +25,7 @@
 #include "ns3/netanim-module.h"
 #include "ns3/lte-module.h"
 #include "ns3/point-to-point-helper.h"
+#include "ns3/gnuplot.h"
 #include "graph.hpp"
 #include "udp-sender.h"
 #include "byte-buffer.h"
@@ -43,9 +44,11 @@ NS_LOG_COMPONENT_DEFINE ("vanet-cs-vfc");
 #define Upload_Enable 						false
 #define Cloud_Enable 						true
 #define Print_Log_Header_On_Receive 				true
+#define Print_Msg_Type 						true
+#define Print_Edge_Type 					true
 #define Print_Received_Data_Cloud 				false
-#define Print_Vehicle_Initial_Request 				true
-#define Print_Vehicle_Initial_Cache 				true
+#define Print_Vehicle_Initial_Request 				false
+#define Print_Vehicle_Initial_Cache 				false
 #define Print_Vehicle_Request 					false
 #define Print_Vehicle_Cache 					false
 #define Print_Vehicle_Final_Request 				true
@@ -58,8 +61,8 @@ NS_LOG_COMPONENT_DEFINE ("vanet-cs-vfc");
 #define Total_Time_Spent_stas 					true
 #define Construct_Graph_And_Find_Clique_Time_stas 		false
 #define Device_Transmission_Range 				450
-#define Gloabal_DB_Size 					20
-#define Num_Cliques 						2
+#define Gloabal_DB_Size 					1000
+#define Num_Cliques 						1
 #define Packet_Size 						1024
 #define Total_Sim_Time 						581.01
 
@@ -304,6 +307,10 @@ private:
 
   void RecordStats (uint32_t obuIdx, uint32_t dataIdx);
 
+  void RemoveDataFromNeededDatas4Decoding (uint32_t obuIdx, uint32_t dataIdx);
+
+  void DecodeFogReq (uint32_t obuIdx, uint32_t fogReqIdx, uint32_t broadcastId);
+
   uint32_t m_protocol; ///< protocol
   uint16_t m_dlPort;  ///< LTE down link port
   uint16_t m_ulPort;  ///< LTE up link port
@@ -345,6 +352,7 @@ private:
   std::string m_mobLogFile; ///< mobility log file
   std::string m_trName; ///< trace file name
   std::string m_animFile; ///< animation file name
+  std::string m_plotFileName; ///< plot file
   int m_log; ///< log
   double m_TotalSimTime; ///< total sim time
   std::string m_rate; ///< rate
@@ -386,7 +394,7 @@ private:
   std::vector<std::map<uint32_t, RequestStatus>> vehsReqsStasInCloud;
   std::vector<ns3::Vector3D> vehsMobInfoInCloud;
 
-  bool isDecoding;
+  std::map<uint32_t, bool> isDecoding;  // clique status
   std::vector<bool> isFirstSubmit;
   GraphMatrix<VertexNode> graph;
   std::vector<std::vector<VertexNode>> cliques;

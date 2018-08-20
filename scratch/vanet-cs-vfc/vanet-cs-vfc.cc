@@ -34,6 +34,7 @@ VanetCsVfcExperiment::VanetCsVfcExperiment ():
     m_mobLogFile (m_workspacePath + "/mobility.log"),
     m_trName (m_workspacePath + "/vanet-cs-vfc.mob"),
     m_animFile (m_workspacePath + "/vanet-cs-vfc-animation.xml"),
+    m_plotFileName (m_workspacePath + "/result/vanet-cs-vfc-plot"),
     m_log (1),
     m_TotalSimTime (Total_Sim_Time),
     m_rate ("2048bps"),
@@ -70,7 +71,6 @@ VanetCsVfcExperiment::VanetCsVfcExperiment ():
   fogsReqs.resize(m_nRsuNodes);
 
   isFirstSubmit.resize(m_nObuNodes, true);
-  isDecoding = false;
 
   datasNeededForDecodingPerClique.resize(m_nObuNodes);
 
@@ -346,9 +346,21 @@ VanetCsVfcExperiment::RunSimulation ()
 
   Run ();
 
+#if Total_Time_Spent_stas
+  endTime = clock();
+  std::cout << "simulation end time " << Now() << " -- " << (double)(endTime - startTime) / CLOCKS_PER_SEC << std::endl;
+#endif
+}
+
+void
+VanetCsVfcExperiment::ProcessOutputs ()
+{
+  NS_LOG_UNCOND ("Process Outputs...");
+
 #if Print_Vehicle_Final_Request
   for (uint32_t i = 0; i < m_nObuNodes; i++)
     {
+      if (vehsReqs[i].size() == 0) continue;
       cout << "veh:" << i << ", final reqs:";
       for(uint32_t req : vehsReqs[i])
 	{
@@ -361,6 +373,7 @@ VanetCsVfcExperiment::RunSimulation ()
 #if Print_Vehicle_Final_Cache
   for (uint32_t i = 0; i < m_nObuNodes; i++)
     {
+      if (vehsCaches[i].size() == Gloabal_DB_Size) continue;
       cout << "veh:" << i << ", final caches:";
       for(uint32_t cache : vehsCaches[i])
 	{
@@ -376,28 +389,36 @@ VanetCsVfcExperiment::RunSimulation ()
   std::cout << "SatisfiedReqs: " << m_requestStats.GetSatisfiedReqs() << std::endl;
   std::cout << "BroadcastPkts: " << m_requestStats.GetBroadcastPkts() << std::endl;
   std::cout << "CumulativeDelay: " << m_requestStats.GetCumulativeDelay() << std::endl;
+
+  NS_ASSERT_MSG(m_requestStats.GetSatisfiedReqs() != 0, "number of satisfied request is 0");
   std::cout << "ASD: " << (m_requestStats.GetCumulativeDelay() / 1e+6) / m_requestStats.GetSatisfiedReqs() << "ms" << std::endl;
+
+  NS_ASSERT_MSG(m_requestStats.GetSubmittedReqs() != 0, "number of submitted request is 0");
   std::cout << "SR: " << (double)m_requestStats.GetSatisfiedReqs() / m_requestStats.GetSubmittedReqs() << std::endl;
+
+  NS_ASSERT_MSG(m_requestStats.GetBroadcastPkts() != 0, "number of broadcast packets is 0");
   std::cout << "BE: " << m_requestStats.GetSatisfiedReqs() / m_requestStats.GetBroadcastPkts() << std::endl;
 
-#if Total_Time_Spent_stas
-  endTime = clock();
-  std::cout << "simulation end time " << Now() << " -- " << (double)(endTime - startTime) / CLOCKS_PER_SEC << std::endl;
-#endif
-
-  Simulator::Destroy ();
-}
-
-void
-VanetCsVfcExperiment::ProcessOutputs ()
-{
-  NS_LOG_UNCOND ("Process Outputs...");
   m_os.close (); // close log file
+
+  Gnuplot plot = Gnuplot (m_plotFileName + ".png");
+  plot.SetTerminal ("png");
+  plot.SetLegend ("X Values", "Y Values");
+  plot.AppendExtra("plot \"result1.dat\" using 1:2 w lp pt 5 title \"111\", \"result2.dat\" using 1:3 w lp pt 7 title \"222\"");
+
+  // Open the plot file.
+  std::ostringstream ossPltFile;
+  ossPltFile << m_plotFileName << ".plt";
+  std::ofstream plotFile (ossPltFile.str().c_str());
+  plot.GenerateOutput (plotFile);
+  // Close the plot file.
+  plotFile.close ();
 }
 
 void
 VanetCsVfcExperiment::Run ()
 {
+
   Simulator::Stop (Seconds (m_TotalSimTime));
 
 #if Output_Animation
@@ -423,6 +444,15 @@ VanetCsVfcExperiment::CourseChange (std::string context, Ptr<const MobilityModel
     {
 //      UploadVehicleInfo(obu);
       vehsEnterFlag[obuIdx] = true;
+
+//      Vector pos_obu = mobility->GetPosition (); // Get position
+//      Vector vel_obu = mobility->GetVelocity (); // Get velocity
+//
+//      std::ostringstream oss;
+//      oss << Simulator::Now () << "obuIdx=" << obuIdx << " POS: x=" << pos_obu.x << ", y=" << pos_obu.y
+//          << "; VEL:" << vel_obu.x << ", y=" << vel_obu.y
+//          << std::endl;
+//      cout << oss.str();
     }
 }
 
@@ -757,10 +787,17 @@ VanetCsVfcExperiment::ConstructGraphAndBroadcast ()
 
   // broadcast clique to vehicles
   broadcastId2cliqueMap.clear();
+  isDecoding.clear();
   for (std::vector<VertexNode> clique : cliques)
     {
       currentBroadcastId++;
-      broadcastId2cliqueMap.insert(make_pair(currentBroadcastId, clique));
+      broadcastId2cliqueMap[currentBroadcastId] = clique;
+      isDecoding[currentBroadcastId] = false;
+    }
+
+  for (uint32_t i = 0; i < m_nObuNodes; i++)
+    {
+      datasNeededForDecodingPerClique[i].clear();
     }
 
   fogIdx2FogReqInCliqueMaps.clear();
@@ -777,6 +814,21 @@ VanetCsVfcExperiment::ConstructGraphAndBroadcast ()
 	{
 	  broadcastData.insert(vertex.reqDataIndex);
 	  fogIdx2FogReqInCliqueMap.insert(make_pair(vertex.fogIndex, vertex.reqDataIndex));
+
+	  for (uint32_t obuIdx : fogCluster[vertex.fogIndex])
+	    {
+	      std::set<uint32_t> datasNeeded;
+	      datasNeeded.insert(broadcastData.begin(), broadcastData.end());
+	      if (vehsReqs[obuIdx].count(vertex.reqDataIndex))
+		{
+		  datasNeeded.erase(vertex.reqDataIndex);
+		}
+	      for (uint32_t cache : vehsCaches[obuIdx])
+		{
+		  datasNeeded.erase(cache);
+		}
+	      datasNeededForDecodingPerClique[obuIdx].insert(make_pair(iter->first, datasNeeded));
+	    }
 	}
       fogIdx2FogReqInCliqueMaps.insert(make_pair(iter->first, fogIdx2FogReqInCliqueMap));
 
@@ -800,41 +852,15 @@ VanetCsVfcExperiment::ConstructGraphAndBroadcast ()
       pktTag->SetReqsIds(reqsIds);
       sender->SetPacketTag(pktTag);
 
-//      Simulator::ScheduleNow (&UdpSender::Send, sender);
-      Simulator::ScheduleNow (&VanetCsVfcExperiment::ResetStatusAndSend, this, sender);
+      Simulator::ScheduleNow (&UdpSender::Send, sender);
     }
-}
-
-void
-VanetCsVfcExperiment::ResetStatusAndSend (Ptr<UdpSender> sender)
-{
-  isDecoding = false;
-  sender->Send();
 }
 
 void
 VanetCsVfcExperiment::Decode (bool isEncoded, uint32_t broadcastId)
 {
-  isDecoding = true;
   if (!isEncoded)
     {
-//      for (std::vector<VertexNode> clique : cliques)
-//	{
-//	  for (VertexNode vertex : clique)
-//	    {
-//	      for (uint32_t obuIdx : fogCluster[vertex.fogIndex])
-//		{
-//		  if (vehsReqs[obuIdx].count(vertex.reqDataIndex))
-//		    {
-//		      vehsReqs[obuIdx].erase(vertex.reqDataIndex);
-//		      vehsCaches[obuIdx].insert(vertex.reqDataIndex);
-//
-//		      RecordStats(obuIdx, vertex.reqDataIndex);
-//		    }
-//		}
-//	    }
-//	}
-
       if (broadcastId2cliqueMap.count(broadcastId) == 0) return;
       for (VertexNode vertex : broadcastId2cliqueMap.at(broadcastId))
 	{
@@ -846,18 +872,22 @@ VanetCsVfcExperiment::Decode (bool isEncoded, uint32_t broadcastId)
 		  vehsCaches[obuIdx].insert(vertex.reqDataIndex);
 
 		  RecordStats(obuIdx, vertex.reqDataIndex);
+
+		  RemoveDataFromNeededDatas4Decoding (obuIdx, vertex.reqDataIndex);
 		}
 	    }
-	}
 
-//      for (uint32_t i = 0; i < m_nObuNodes; i++)
-//	{
-//	  if (vehsReqs[i].count(data))
+//	  for (uint32_t i = 0; i < m_nObuNodes; i++)
 //	    {
-//	      vehsReqs[i].erase(data);
-//	      vehsCaches[i].insert(data);
+//	      if (vehsReqs[i].count(data))
+//		{
+//		  vehsReqs[i].erase(data);
+//		  vehsCaches[i].insert(data);
+//
+//		  RecordStats(obuIdx, vertex.reqDataIndex);
+//		}
 //	    }
-//	}
+	}
     }
 #if 1
   else
@@ -870,7 +900,7 @@ VanetCsVfcExperiment::Decode (bool isEncoded, uint32_t broadcastId)
 	  fogIdxsInCliques.insert(vertex.fogIndex);
 	}
       uint32_t size = clique.size();
-
+#if 0
       for (uint32_t i = 0; i < size; i++)
 	{
 	  VertexNode vertex = clique[i];
@@ -880,7 +910,7 @@ VanetCsVfcExperiment::Decode (bool isEncoded, uint32_t broadcastId)
 		{
 		  map<uint32_t, std::set<uint32_t>>::iterator it = datasNeededForDecodingPerClique[obuIdx].find(broadcastId);
 		  NS_ASSERT (it != datasNeededForDecodingPerClique[obuIdx].end());
-		  it->second.erase(vertex.reqDataIndex);
+//		  it->second.erase(vertex.reqDataIndex);
 
 		  for (uint32_t data : it->second)
 		    {
@@ -925,6 +955,7 @@ VanetCsVfcExperiment::Decode (bool isEncoded, uint32_t broadcastId)
 		}
 	    }
 	}
+#endif
 
       for (uint32_t i = 0; i < size; i++)
 	{
@@ -950,7 +981,6 @@ VanetCsVfcExperiment::Decode (bool isEncoded, uint32_t broadcastId)
 			  {
 			    for (uint32_t obuIdx : fogCluster[k])
 			      {
-
 				if (vehsCaches[obuIdx].count(vertex1.reqDataIndex))
 				  {
 				    Ptr<UdpSender> sender = CreateObject<UdpSender>();
@@ -1151,6 +1181,34 @@ void VanetCsVfcExperiment::RecordStats (uint32_t obuIdx, uint32_t dataIdx)
 
   m_requestStats.IncSatisfiedReqs();
   m_requestStats.IncCumulativeDelay(it->second.satisfiedTime - it->second.submitTime);
+}
+
+void VanetCsVfcExperiment::RemoveDataFromNeededDatas4Decoding (uint32_t obuIdx, uint32_t dataIdx)
+{
+  map<uint32_t, std::set<uint32_t>>::iterator iter = datasNeededForDecodingPerClique[obuIdx].begin();
+  iter->second.erase(dataIdx);
+  for (; iter != datasNeededForDecodingPerClique[obuIdx].end(); iter++)
+    {
+    }
+}
+
+void VanetCsVfcExperiment::DecodeFogReq (uint32_t obuIdx, uint32_t fogReqIdx, uint32_t broadcastId)
+{
+  map<uint32_t, std::set<uint32_t>>::iterator it = datasNeededForDecodingPerClique[obuIdx].find(broadcastId);
+  NS_ASSERT (it != datasNeededForDecodingPerClique[obuIdx].end());
+  if (it->second.size() == 0)
+    {
+      if (vehsCaches[obuIdx].count(fogReqIdx) == 0)
+	{
+	  vehsCaches[obuIdx].insert(fogReqIdx);
+	}
+      if (vehsReqs[obuIdx].count(fogReqIdx) != 0)
+	{
+	  vehsReqs[obuIdx].erase(fogReqIdx);
+	  RecordStats(obuIdx, fogReqIdx);
+	  RemoveDataFromNeededDatas4Decoding (obuIdx, fogReqIdx);
+	}
+    }
 }
 
 void
@@ -1663,39 +1721,46 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
     }
   else if (recvHeader.GetType() == PacketHeader::MessageType::DATA_C2V)
     {
+#if Print_Msg_Type
+      oss << " MessageType::DATA_C2V ";
+#endif
+
       using vanet::PacketTagC2v;
       PacketTagC2v pktTagC2v;
       pktCopy->RemovePacketTag(pktTagC2v);
       std::vector<uint32_t> reqIds = pktTagC2v.GetReqsIds();
       uint32_t broadcastDataNum = reqIds.size();
 
-    //  std::ostringstream oss;
-    //  oss << "sim time:" <<Simulator::Now ().GetSeconds ();
-    //  oss << ", reqIds:";
-    //  for (uint32_t reqId : reqIds)
-    //    {
-    //      oss << " " << reqId;
-    //    }
-    //  NS_LOG_UNCOND(oss.str());
-
       if (broadcastDataNum == 0) return;
 
       // Judging whether the broadcasted data is encoded or not
       bool isEncoded = broadcastDataNum == 1 ? false : true;
 
-      if (!isDecoding)
+      if (!isDecoding[recvHeader.GetBroadcastId()])
 	{
-	  for (uint32_t i = 0; i < m_nObuNodes; i++)
-	    {
-	      std::set<uint32_t> datasNeeded;
-	      datasNeeded.insert(reqIds.begin(), reqIds.end());
-	      datasNeededForDecodingPerClique[i].insert(make_pair(recvHeader.GetBroadcastId(), datasNeeded));
-	    }
+//	  for (uint32_t i = 0; i < m_nObuNodes; i++)
+//	    {
+//	      std::set<uint32_t> datasNeeded;
+//	      datasNeeded.insert(reqIds.begin(), reqIds.end());
+//	      uint32_t fogReqIdx = fogIdx2FogReqInCliqueMaps.at(recvHeader.GetBroadcastId()).at(vehIdx2FogIdxMap.at(i));
+//	      datasNeeded.erase(fogReqIdx);
+//	      for (uint32_t cache : vehsCaches[i])
+//		{
+//		  datasNeeded.erase(cache);
+//		}
+//	      datasNeededForDecodingPerClique[i].insert(make_pair(recvHeader.GetBroadcastId(), datasNeeded));
+//	    }
+
+	  isDecoding[recvHeader.GetBroadcastId()] = true;
 	  Decode(isEncoded, recvHeader.GetBroadcastId());
 	}
     }
   else if (recvHeader.GetType() == PacketHeader::MessageType::DATA_V2F)
     {
+#if Print_Msg_Type
+      oss << " MessageType::DATA_C2V ";
+#endif
+
       using vanet::PacketTagV2f;
       PacketTagV2f pktTagV2f;
       pktCopy->RemovePacketTag(pktTagV2f);
@@ -1709,6 +1774,9 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
       PacketTagV2f::NextActionType nextAction = pktTagV2f.GetNextActionType();
       if (edgeType == EdgeType::NOT_SET)
 	{
+#if Print_Edge_Type
+	  oss << " EdgeType::NOT_SET ";
+#endif
 	  if (nextAction == PacketTagV2f::NextActionType::F2V)
 	    {
 	      Ptr<UdpSender> sender = CreateObject<UdpSender>();
@@ -1725,6 +1793,7 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
 	      using vanet::PacketTagF2v;
 	      PacketTagF2v *pktTagF2v = new PacketTagF2v();
 	      pktTagF2v->SetCurrentEdgeType(EdgeType::NOT_SET);
+	      pktTagF2v->SetNextActionType(PacketTagF2v::NextActionType::NOT_SET);
 	      pktTagF2v->SetFogId(nodeId);
 	      pktTagF2v->SetDataIdxs(pktTagV2f.GetDataIdxs());
 	      sender->SetPacketTag(pktTagF2v);
@@ -1734,6 +1803,9 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
 	}
       else if (edgeType == EdgeType::CONDITION_1)
 	{
+#if Print_Edge_Type
+	  oss << " EdgeType::CONDITION_1 ";
+#endif
 	  std::vector<uint32_t> rsuWaitingServedIdxs = pktTagV2f.GetRsuWaitingServedIdxs();
 	  for (uint32_t rsuIdx : rsuWaitingServedIdxs)
 	    {
@@ -1760,6 +1832,9 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
 //      else if (nextAction == PacketTagV2f::NextActionType::F2V)
       else if (edgeType == EdgeType::CONDITION_2)
 	{
+#if Print_Edge_Type
+	  oss << " EdgeType::CONDITION_2 ";
+#endif
 	  Ptr<UdpSender> sender = CreateObject<UdpSender>();
 	  sender->SetNode(NodeList::GetNode(nodeId));
 	  sender->SetRemote(Ipv4Address("10.3.255.255"), m_i2VPort);
@@ -1774,7 +1849,7 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
 	  using vanet::PacketTagF2v;
 	  PacketTagF2v *pktTagF2v = new PacketTagF2v();
 	  pktTagF2v->SetCurrentEdgeType(EdgeType::CONDITION_2);
-//	  pktTagF2v->SetPreActionType(PacketTagF2v::PreActionType::V2F);
+	  pktTagF2v->SetNextActionType(PacketTagF2v::NextActionType::NOT_SET);
 	  pktTagF2v->SetFogId(nodeId);
 	  pktTagF2v->SetDataIdxs(pktTagV2f.GetDataIdxs());
 	  sender->SetPacketTag(pktTagF2v);
@@ -1783,6 +1858,9 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
 	}
       else if (edgeType == EdgeType::CONDITION_3)
 	{
+#if Print_Edge_Type
+	  oss << " EdgeType::CONDITION_3 ";
+#endif
 	  if (nextAction == PacketTagV2f::NextActionType::F2V)
 	    {
 	      Ptr<UdpSender> sender = CreateObject<UdpSender>();
@@ -1799,6 +1877,7 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
 	      using vanet::PacketTagF2v;
 	      PacketTagF2v *pktTagF2v = new PacketTagF2v();
 	      pktTagF2v->SetCurrentEdgeType(EdgeType::CONDITION_3);
+	      pktTagF2v->SetNextActionType(PacketTagF2v::NextActionType::V2F);
 	      pktTagF2v->SetFogId(nodeId);
 	      pktTagF2v->SetRsuWaitingServedIdxs(pktTagV2f.GetRsuWaitingServedIdxs());
 	      pktTagF2v->SetDataIdxs(pktTagV2f.GetDataIdxs());
@@ -1808,13 +1887,37 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
 	    }
 	  else if (nextAction == PacketTagV2f::NextActionType::F2F)
 	    {
+	      std::vector<uint32_t> rsuWaitingServedIdxs = pktTagV2f.GetRsuWaitingServedIdxs();
+	      for (uint32_t rsuIdx : rsuWaitingServedIdxs)
+		{
+		  Ptr<UdpSender> sender = CreateObject<UdpSender>();
+		  sender->SetNode(NodeList::GetNode(nodeId));
+		  sender->SetRemote(m_rsuCsmaInterfaces.GetAddress(rsuIdx), m_i2IPort);
+		  sender->SetDataSize(Packet_Size);
+		  sender->Start();
+		  using vanet::PacketHeader;
+		  PacketHeader header;
+		  header.SetType(PacketHeader::MessageType::DATA_F2F);
+		  header.SetBroadcastId(recvHeader.GetBroadcastId());
+		  sender->SetHeader(header);
 
+		  using vanet::PacketTagF2f;
+		  PacketTagF2f *pktTagF2f = new PacketTagF2f();
+		  pktTagF2f->SetCurrentEdgeType(EdgeType::CONDITION_3);
+		  pktTagF2f->SetDataIdxs(pktTagV2f.GetDataIdxs());
+		  sender->SetPacketTag(pktTagF2f);
+
+		  Simulator::ScheduleNow (&UdpSender::Send, sender);
+		}
 	    }
 	}
 
     }
   else if (recvHeader.GetType() == PacketHeader::MessageType::DATA_F2F)
     {
+#if Print_Msg_Type
+	  oss << " MessageType::DATA_F2F ";
+#endif
       using vanet::PacketTagF2f;
       PacketTagF2f pktTagF2f;
       pktCopy->RemovePacketTag(pktTagF2f);
@@ -1827,6 +1930,9 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
       EdgeType edgeType = pktTagF2f.GetCurrentEdgeType();
       if (edgeType == EdgeType::CONDITION_1)
 	{
+#if Print_Edge_Type
+	  oss << " EdgeType::CONDITION_1 ";
+#endif
 	  Ptr<UdpSender> sender = CreateObject<UdpSender>();
 	  sender->SetNode(NodeList::GetNode(nodeId));
 	  sender->SetRemote(Ipv4Address ("10.3.255.255"), m_i2VPort);
@@ -1841,6 +1947,7 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
 	  using vanet::PacketTagF2v;
 	  PacketTagF2v *pktTagF2v = new PacketTagF2v();
 	  pktTagF2v->SetCurrentEdgeType(EdgeType::CONDITION_1);
+	  pktTagF2v->SetNextActionType(PacketTagF2v::NextActionType::NOT_SET);
 	  pktTagF2v->SetFogId(nodeId);
 	  pktTagF2v->SetDataIdxs(pktTagF2f.GetDataIdxs());
 	  sender->SetPacketTag(pktTagF2v);
@@ -1849,6 +1956,9 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
 	}
       else if (edgeType == EdgeType::CONDITION_3)
 	{
+#if Print_Edge_Type
+	  oss << " EdgeType::CONDITION_3 ";
+#endif
 	  Ptr<UdpSender> sender = CreateObject<UdpSender>();
 	  sender->SetNode(NodeList::GetNode(nodeId));
 	  sender->SetRemote(Ipv4Address ("10.3.255.255"), m_i2VPort);
@@ -1863,6 +1973,7 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
 	  using vanet::PacketTagF2v;
 	  PacketTagF2v *pktTagF2v = new PacketTagF2v();
 	  pktTagF2v->SetCurrentEdgeType(EdgeType::CONDITION_3);
+	  pktTagF2v->SetNextActionType(PacketTagF2v::NextActionType::NOT_SET);
 	  pktTagF2v->SetFogId(nodeId);
 	  pktTagF2v->SetDataIdxs(pktTagF2f.GetDataIdxs());
 	  sender->SetPacketTag(pktTagF2v);
@@ -1872,14 +1983,12 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
     }
   else if (recvHeader.GetType() == PacketHeader::MessageType::DATA_F2V)
     {
+#if Print_Msg_Type
+	  oss << " MessageType::DATA_F2V ";
+#endif
       using vanet::PacketTagF2v;
       PacketTagF2v pktTagF2v;
       pktCopy->RemovePacketTag(pktTagF2v);
-
-//      std::cout << oss.str ();
-//      std::cout << " F2V obuIdx:" << nodeId <<",";
-//      pktTagF2v.Print(std::cout);
-//      std::cout << endl;
 
       uint32_t fogId = pktTagF2v.GetFogId();
       Ptr<Node> rsu = NodeList::GetNode(fogId);
@@ -1895,14 +2004,18 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
 	  return;
 	}
 
+      uint32_t fogIdx = fogId2FogIdxMap.at(pktTagF2v.GetFogId());
+      uint32_t obuIdx = vehId2IndexMap.at(nodeId);
+      uint32_t broadcastId = recvHeader.GetBroadcastId();
       EdgeType edgeType = pktTagF2v.GetCurrentEdgeType();
+      PacketTagF2v::NextActionType nextAction = pktTagF2v.GetNextActionType();
       if (edgeType == EdgeType::NOT_SET)
 	{
-	  uint32_t fogIdx = fogId2FogIdxMap.at(pktTagF2v.GetFogId());
-	  uint32_t obuIdx = vehId2IndexMap.at(nodeId);
-
-	  if (fogIdx2FogReqInCliqueMaps.count(recvHeader.GetBroadcastId()) == 0) return;
-	  uint32_t fogReqIdx = fogIdx2FogReqInCliqueMaps.at(recvHeader.GetBroadcastId()).at(fogIdx);
+#if Print_Edge_Type
+	  oss << " EdgeType::NOT_SET ";
+#endif
+	  if (fogIdx2FogReqInCliqueMaps.count(broadcastId) == 0) return;
+	  uint32_t fogReqIdx = fogIdx2FogReqInCliqueMaps.at(broadcastId).at(fogIdx);
 	  std::vector<uint32_t> dataIdxs = pktTagF2v.GetDataIdxs();
 	  for (uint32_t dataIdx : dataIdxs)
 	    {
@@ -1911,136 +2024,141 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
 		  if (vehsCaches[obuIdx].count(dataIdx) == 0)
 		    {
 		      vehsCaches[obuIdx].insert(dataIdx);
+		      map<uint32_t, std::set<uint32_t>>::iterator iter = datasNeededForDecodingPerClique[obuIdx].find(broadcastId);
+		      NS_ASSERT (iter != datasNeededForDecodingPerClique[obuIdx].end());
+		      iter->second.erase(dataIdx);
 		    }
 		  if (vehsReqs[obuIdx].count(dataIdx) != 0)
 		    {
 		      vehsReqs[obuIdx].erase(dataIdx);
 		      RecordStats(obuIdx, dataIdx);
 		    }
-
-		  map<uint32_t, std::set<uint32_t>>::iterator it = datasNeededForDecodingPerClique[obuIdx].find(recvHeader.GetBroadcastId());
-		  NS_ASSERT (it != datasNeededForDecodingPerClique[obuIdx].end());
-		  it->second.erase(dataIdx);
-		  if (it->second.size() == 0)
-		    {
-		      if (vehsCaches[obuIdx].count(fogReqIdx) == 0)
-			{
-			  vehsCaches[obuIdx].insert(fogReqIdx);
-			}
-		      if (vehsReqs[obuIdx].count(fogReqIdx) != 0)
-			{
-			  vehsReqs[obuIdx].erase(fogReqIdx);
-			  RecordStats(obuIdx, fogReqIdx);
-			}
-		    }
+		  DecodeFogReq (obuIdx, fogReqIdx, broadcastId);
 		}
 	    }
 	}
       else if (edgeType == EdgeType::CONDITION_1)
 	{
+#if Print_Edge_Type
+	  oss << " EdgeType::CONDITION_1 ";
+#endif
 	  std::vector<uint32_t> dataIdxs = pktTagF2v.GetDataIdxs();
 	  for (uint32_t dataIdx : dataIdxs)
 	    {
-	      uint32_t obuIdx = vehId2IndexMap.at(nodeId);
 	      if (vehsReqs[obuIdx].count(dataIdx) != 0)
 		{
-		  if (vehsCaches[obuIdx].count(dataIdx) == 0)
+//		  if (vehsCaches[obuIdx].count(dataIdx) == 0)
+//		    {
+//		      vehsCaches[obuIdx].insert(dataIdx);
+//		      map<uint32_t, std::set<uint32_t>>::iterator iter = datasNeededForDecodingPerClique[obuIdx].find(broadcastId);
+//		      NS_ASSERT (iter != datasNeededForDecodingPerClique[obuIdx].end());
+//		      iter->second.erase(dataIdx);
+//		    }
+		  vehsCaches[obuIdx].insert(dataIdx);
+		  map<uint32_t, std::set<uint32_t>>::iterator iter = datasNeededForDecodingPerClique[obuIdx].begin();
+		  for (; iter != datasNeededForDecodingPerClique[obuIdx].end(); iter++)
 		    {
-		      vehsCaches[obuIdx].insert(dataIdx);
-		    }
-		  if (vehsReqs[obuIdx].count(dataIdx) != 0)
-		    {
-		      vehsReqs[obuIdx].erase(dataIdx);
-		      RecordStats(obuIdx, dataIdx);
+		      iter->second.erase(dataIdx);
+		      if (iter->second.size() == 0)
+			{
+			  if (fogIdx2FogReqInCliqueMaps.count(iter->first)
+			      && fogIdx2FogReqInCliqueMaps.at(iter->first).count(fogIdx))
+			    {
+			      uint32_t fogReqIdx = fogIdx2FogReqInCliqueMaps.at(iter->first).at(fogIdx);
+			      if (vehsReqs[obuIdx].count(fogReqIdx) != 0)
+				{
+				  vehsReqs[obuIdx].erase(fogReqIdx);
+				  vehsCaches[obuIdx].insert(fogReqIdx);
+				  RecordStats(obuIdx, fogReqIdx);
+				}
+			    }
+			}
 		    }
 
-		  map<uint32_t, std::set<uint32_t>>::iterator it = datasNeededForDecodingPerClique[obuIdx].find(recvHeader.GetBroadcastId());
-		  NS_ASSERT (it != datasNeededForDecodingPerClique[obuIdx].end());
-		  it->second.erase(dataIdx);
+		  vehsReqs[obuIdx].erase(dataIdx);
+		  RecordStats(obuIdx, dataIdx);
 		}
 	    }
 	}
       else if (edgeType == EdgeType::CONDITION_2)
 	{
-	  uint32_t fogIdx = fogId2FogIdxMap.at(pktTagF2v.GetFogId());
-	  uint32_t obuIdx = vehId2IndexMap.at(nodeId);
-
-	  if (fogIdx2FogReqInCliqueMaps.count(recvHeader.GetBroadcastId()) == 0) return;
-	  uint32_t fogReqIdx = fogIdx2FogReqInCliqueMaps.at(recvHeader.GetBroadcastId()).at(fogIdx);
+#if Print_Edge_Type
+	  oss << " EdgeType::CONDITION_2 ";
+#endif
+	  if (fogIdx2FogReqInCliqueMaps.count(broadcastId) == 0) return;
 	  std::vector<uint32_t> dataIdxs = pktTagF2v.GetDataIdxs();
 	  for (uint32_t dataIdx : dataIdxs)
 	    {
-	      if (vehsReqs[obuIdx].count(fogReqIdx) != 0)
-		{
-		  if (vehsCaches[obuIdx].count(dataIdx) == 0)
-		    {
-		      vehsCaches[obuIdx].insert(dataIdx);
-		    }
-		  if (vehsReqs[obuIdx].count(dataIdx) != 0)
-		    {
-		      vehsReqs[obuIdx].erase(dataIdx);
-		      RecordStats(obuIdx, dataIdx);
-		    }
+//		      map<uint32_t, std::set<uint32_t>>::iterator iter = datasNeededForDecodingPerClique[obuIdx].find(broadcastId);
+//		      NS_ASSERT (iter != datasNeededForDecodingPerClique[obuIdx].end());
+//		      iter->second.erase(dataIdx);
 
-		  map<uint32_t, std::set<uint32_t>>::iterator it = datasNeededForDecodingPerClique[obuIdx].find(recvHeader.GetBroadcastId());
-		  NS_ASSERT (it != datasNeededForDecodingPerClique[obuIdx].end());
-		  it->second.erase(dataIdx);
-		  if (it->second.size() == 0)
+	      vehsCaches[obuIdx].insert(dataIdx);
+	      map<uint32_t, std::set<uint32_t>>::iterator iter = datasNeededForDecodingPerClique[obuIdx].begin();
+	      for (; iter != datasNeededForDecodingPerClique[obuIdx].end(); iter++)
+		{
+		  iter->second.erase(dataIdx);
+		  if (iter->second.size() == 0)
 		    {
-		      if (vehsCaches[obuIdx].count(fogReqIdx) == 0)
+		      if (fogIdx2FogReqInCliqueMaps.count(iter->first)
+			  && fogIdx2FogReqInCliqueMaps.at(iter->first).count(fogIdx))
 			{
-			  vehsCaches[obuIdx].insert(fogReqIdx);
-			}
-		      if (vehsReqs[obuIdx].count(fogReqIdx) != 0)
-			{
-			  vehsReqs[obuIdx].erase(fogReqIdx);
-			  RecordStats(obuIdx, fogReqIdx);
+			  uint32_t fogReqIdx = fogIdx2FogReqInCliqueMaps.at(iter->first).at(fogIdx);
+			  if (vehsReqs[obuIdx].count(fogReqIdx) != 0)
+			    {
+			      vehsReqs[obuIdx].erase(fogReqIdx);
+			      vehsCaches[obuIdx].insert(fogReqIdx);
+			      RecordStats(obuIdx, fogReqIdx);
+			    }
 			}
 		    }
+		}
+	      if (vehsReqs[obuIdx].count(dataIdx) != 0)
+		{
+		  vehsReqs[obuIdx].erase(dataIdx);
+		  RecordStats(obuIdx, dataIdx);
 		}
 	    }
 	}
       else if (edgeType == EdgeType::CONDITION_3)
 	{
-	  uint32_t fogIdx = fogId2FogIdxMap.at(pktTagF2v.GetFogId());
-	  uint32_t obuIdx = vehId2IndexMap.at(nodeId);
-
+#if Print_Edge_Type
+	  oss << " EdgeType::CONDITION_3 ";
+#endif
 	  if (fogIdx2FogReqInCliqueMaps.count(recvHeader.GetBroadcastId()) == 0) return;
-	  uint32_t fogReqIdx = fogIdx2FogReqInCliqueMaps.at(recvHeader.GetBroadcastId()).at(fogIdx);
 	  std::vector<uint32_t> dataIdxs = pktTagF2v.GetDataIdxs();
 	  for (uint32_t dataIdx : dataIdxs)
 	    {
-	      if (vehsReqs[obuIdx].count(fogReqIdx) != 0)
+	      vehsCaches[obuIdx].insert(dataIdx);
+	      map<uint32_t, std::set<uint32_t>>::iterator iter = datasNeededForDecodingPerClique[obuIdx].begin();
+	      for (; iter != datasNeededForDecodingPerClique[obuIdx].end(); iter++)
 		{
-		  if (vehsCaches[obuIdx].count(dataIdx) == 0)
+		  iter->second.erase(dataIdx);
+		  if (iter->second.size() == 0)
 		    {
-		      vehsCaches[obuIdx].insert(dataIdx);
-		    }
-		  if (vehsReqs[obuIdx].count(dataIdx) != 0)
-		    {
-		      vehsReqs[obuIdx].erase(dataIdx);
-		      RecordStats(obuIdx, dataIdx);
-		    }
-
-		  map<uint32_t, std::set<uint32_t>>::iterator it = datasNeededForDecodingPerClique[obuIdx].find(recvHeader.GetBroadcastId());
-		  NS_ASSERT (it != datasNeededForDecodingPerClique[obuIdx].end());
-		  it->second.erase(dataIdx);
-		  if (it->second.size() == 0)
-		    {
-		      if (vehsCaches[obuIdx].count(fogReqIdx) == 0)
+		      if (fogIdx2FogReqInCliqueMaps.count(iter->first)
+			  && fogIdx2FogReqInCliqueMaps.at(iter->first).count(fogIdx))
 			{
-			  vehsCaches[obuIdx].insert(fogReqIdx);
-			}
-		      if (vehsReqs[obuIdx].count(fogReqIdx) != 0)
-			{
-			  vehsReqs[obuIdx].erase(fogReqIdx);
-			  RecordStats(obuIdx, fogReqIdx);
+			  uint32_t fogReqIdx = fogIdx2FogReqInCliqueMaps.at(iter->first).at(fogIdx);
+			  if (vehsReqs[obuIdx].count(fogReqIdx) != 0)
+			    {
+			      vehsReqs[obuIdx].erase(fogReqIdx);
+			      vehsCaches[obuIdx].insert(fogReqIdx);
+			      RecordStats(obuIdx, fogReqIdx);
+			    }
 			}
 		    }
+		}
+	      if (vehsReqs[obuIdx].count(dataIdx) != 0)
+		{
+		  vehsReqs[obuIdx].erase(dataIdx);
+		  RecordStats(obuIdx, dataIdx);
+		}
 
+	      if (nextAction == PacketTagF2v::NextActionType::V2F)
+		{
 		  if (pktTagF2v.GetRsuWaitingServedIdxs().size() != 0)
 		    {
-
 		      Ptr<UdpSender> sender = CreateObject<UdpSender>();
 		      sender->SetNode(NodeList::GetNode(nodeId));
 		      sender->SetRemote(m_rsu80211pInterfaces.GetAddress(fogIdx), m_v2IPort);
@@ -2093,6 +2211,7 @@ int
 main (int argc, char *argv[])
 {
   VanetCsVfcExperiment experiment;
+
   experiment.Simulate (argc, argv);
   return 0;
 }

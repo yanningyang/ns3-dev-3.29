@@ -62,41 +62,35 @@ PacketTagF2v::GetCurrentEdgeType (void) const
 }
 
 void
-PacketTagF2v::SetPreActionType (PacketTagF2v::PreActionType type)
+PacketTagF2v::SetNextActionType (PacketTagF2v::NextActionType type)
 {
   switch (type)
     {
-    case PreActionType::NOT_SET:
-      m_preActionType = 0;
+    case NextActionType::NOT_SET:
+      m_nextActionType = 0;
       break;
-    case PreActionType::F2F:
-      m_preActionType = 1;
-      break;
-    case PreActionType::V2F:
-      m_preActionType = 2;
+    case NextActionType::V2F:
+      m_nextActionType = 1;
       break;
     default:
-      NS_FATAL_ERROR ("Unknown PreAction-Type: " << static_cast<uint8_t> (type));
+      NS_FATAL_ERROR ("Unknown NextAction-Type: " << static_cast<uint8_t> (type));
       break;
     }
 }
-PacketTagF2v::PreActionType
-PacketTagF2v::GetPreActionType (void) const
+PacketTagF2v::NextActionType
+PacketTagF2v::GetNextActionType (void) const
 {
-  PreActionType ret;
-  switch (m_preActionType)
+  NextActionType ret;
+  switch (m_nextActionType)
     {
     case 0:
-      ret = PreActionType::NOT_SET;
+      ret = NextActionType::NOT_SET;
       break;
     case 1:
-      ret = PreActionType::F2F;
-      break;
-    case 2:
-      ret = PreActionType::V2F;
+      ret = NextActionType::V2F;
       break;
     default:
-      NS_FATAL_ERROR ("Unknown PreAction-Type: " << m_preActionType);
+      NS_FATAL_ERROR ("Unknown NextAction-Type: " << m_nextActionType);
       break;
     }
   return ret;
@@ -167,7 +161,7 @@ void
 PacketTagF2v::Serialize (TagBuffer i) const
 {
   i.WriteU8(m_currentEdgeType);
-  i.WriteU8(m_preActionType);
+  i.WriteU8(m_nextActionType);
   i.WriteU32(m_fogId);
 
   uint32_t size0 = m_rsuWaitingServedIdxs.size();
@@ -188,7 +182,7 @@ void
 PacketTagF2v::Deserialize (TagBuffer i)
 {
   m_currentEdgeType = i.ReadU8();
-  m_preActionType = i.ReadU8();
+  m_nextActionType = i.ReadU8();
   m_fogId = i.ReadU32();
 
   uint32_t size0 = i.ReadU32 ();
@@ -207,7 +201,7 @@ void
 PacketTagF2v::Print (std::ostream &os) const
 {
   os << "currentEdgeType=" << m_currentEdgeType;
-  os << ", preActionType=" << m_preActionType;
+  os << ", preActionType=" << m_nextActionType;
   os << ", fogId=" << m_fogId;
   os << ", rsuWaitingServedIdxs=";
   for (uint32_t rsuIdx : m_rsuWaitingServedIdxs)

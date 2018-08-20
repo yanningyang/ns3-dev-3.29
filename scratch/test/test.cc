@@ -99,23 +99,34 @@ main (int argc, char *argv[])
   }
 #endif
 
-//  std::map<uint32_t, uint32_t> haha;
-//  for (uint32_t i = 0; i < 10; i++)
-//    {
-//      haha.insert(make_pair(i, i * i));
-//    }
-//
-//  std::map<uint32_t, uint32_t>::iterator iter = haha.begin();
-//  for (; iter != haha.end(); iter++)
-//    {
-//      cout << iter->first << "=" << iter->second << endl;
-//    }
+  std::set<uint32_t> haha;
+  std::set<uint32_t> hehe;
+  for (uint32_t i = 0; i < 10; i++)
+    {
+      haha.insert(i);
+    }
+  hehe.insert(2);
+  hehe.insert(4);
+  hehe.insert(6);
 
-  Simulator::Schedule(Seconds(1), &test);
-  cout << Seconds(1).GetDouble() << endl;
-  cout << Time(1.0).GetDouble() << endl;
+  std::set<uint32_t>::iterator iter = haha.begin();
+  for (; iter != haha.end(); iter++)
+    {
+      cout << " " << *iter;
+    }
+  cout << endl;
 
-  Simulator::Stop(Seconds(10));
-  Simulator::Run();
-  Simulator::Destroy();
+  std::set<uint32_t>::iterator iter2 = hehe.begin();
+  for (; iter2 != hehe.end(); iter2++)
+    {
+      haha.erase(*iter2);
+    }
+
+
+  iter = haha.begin();
+  for (; iter != haha.end(); iter++)
+    {
+      cout << " " << *iter;
+    }
+  cout << endl;
 }
