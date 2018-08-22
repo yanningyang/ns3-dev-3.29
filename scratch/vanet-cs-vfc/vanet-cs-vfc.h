@@ -39,6 +39,7 @@
 NS_LOG_COMPONENT_DEFINE ("vanet-cs-vfc");
 
 #define Output_Animation 					false
+#define Gen_Gnuplot_File					false
 
 #define Lte_Enable 						false	// turn on/off LTE
 #define Upload_Enable 						false
@@ -47,6 +48,7 @@ NS_LOG_COMPONENT_DEFINE ("vanet-cs-vfc");
 #define Print_Msg_Type 						true
 #define Print_Edge_Type 					true
 #define Print_Received_Data_Cloud 				false
+#define Print_Received_Log 					false
 #define Print_Vehicle_Initial_Request 				false
 #define Print_Vehicle_Initial_Cache 				false
 #define Print_Vehicle_Request 					false
@@ -54,14 +56,15 @@ NS_LOG_COMPONENT_DEFINE ("vanet-cs-vfc");
 #define Print_Vehicle_Final_Request 				true
 #define Print_Vehicle_Final_Cache 				true
 #define Print_Fog_Cluster 					false
-#define Construct_Graph 					true
+#define Scheduling 						true
 #define Print_Edge 						false
 #define Search_Clique 						true
 #define Print_Cliques 						true
 #define Total_Time_Spent_stas 					true
 #define Construct_Graph_And_Find_Clique_Time_stas 		false
+
 #define Device_Transmission_Range 				450
-#define Gloabal_DB_Size 					1000
+#define Gloabal_DB_Size 					200
 #define Num_Cliques 						1
 #define Packet_Size 						1024
 #define Total_Sim_Time 						581.01
@@ -262,11 +265,15 @@ private:
 
   void ReceivePacketWithAddr (std::string context, Ptr<const Packet> packet, const Address & srcAddr, const Address & destAddr);
 
+  void ReceivePacketOnSchemeCsVfc (uint32_t nodeId, Ptr<const Packet> packet, const Address & srcAddr, const Address & destAddr);
+
+  void ReceivePacketOnSchemeNcb (uint32_t nodeId, Ptr<const Packet> packet, const Address & srcAddr, const Address & destAddr);
+
   /**
    * \brief Set up a prescribed scenario
    * \return none
    */
-  void SetupScenario ();
+  void Initialization ();
 
   /**
    * Course change function
@@ -285,9 +292,9 @@ private:
 
   void LoopPerSecond ();
 
-  void SubmitRequests(Ptr<Node> obu);
+  void SubmitVehRequests(Ptr<Node> obu);
 
-  void SubmitAllRequests();
+  void SubmitAllVehsRequests();
 
   void UploadVehicleInfo (Ptr<Node> obu);
 
@@ -301,15 +308,13 @@ private:
 
   void ConstructGraphAndBroadcast ();
 
+  void ConstructMostRewardingPktToBroadcast ();
+
   void ResetStatusAndSend (Ptr<UdpSender> sender);
 
   void Decode (bool isEncoded, uint32_t broadcastId);
 
   void RecordStats (uint32_t obuIdx, uint32_t dataIdx);
-
-  void RemoveDataFromNeededDatas4Decoding (uint32_t obuIdx, uint32_t dataIdx);
-
-  void DecodeFogReq (uint32_t obuIdx, uint32_t fogReqIdx, uint32_t broadcastId);
 
   uint32_t m_protocol; ///< protocol
   uint16_t m_dlPort;  ///< LTE down link port
@@ -318,6 +323,8 @@ private:
   uint16_t m_i2IPort;  ///< I2I port
   uint16_t m_i2VPort;  ///< I2V port
   std::string m_protocolName; ///< protocol name
+
+  std::string m_schemeName; ///< scheme name
 
   uint32_t m_nObuNodes; ///< number of vehicle
   NodeContainer m_obuNodes; ///< the nodes
@@ -359,7 +366,7 @@ private:
   uint32_t m_wavePacketSize; ///< bytes
   uint32_t m_nonSafetySize; ///< bytes
   double m_waveInterval; ///< seconds
-  std::ofstream m_os; ///< output stream
+  std::ofstream m_ofs; ///< output stream
   int m_verbose = false;
   int m_routingTables; ///< dump routing table (at t=5 sec).  0=No, 1=Yes
   int m_asciiTrace; ///< ascii trace
@@ -369,6 +376,7 @@ private:
   Ptr<WifiPhyStats> m_wifiPhyStats; ///< wifi phy statistics
   RoutingStats m_routingStats; ///< routing statistics
 
+  std::uint32_t globalDbSize;
   std::vector<uint32_t> globalDB;
   std::map<uint32_t, uint32_t> vehId2IndexMap;
   std::vector<bool> vehsEnterFlag;
@@ -403,6 +411,13 @@ private:
   std::vector<std::map<uint32_t, std::set<uint32_t>>> datasNeededForDecodingPerClique;
 
   uint32_t receive_count;
+
+  std::list<ReqQueueItem> requestQueue;
+  std::map<uint32_t, ReqQueueItem> reqQueHead;
+  std::map<uint32_t, std::set<uint32_t>> vehsToSatisfy;
+  std::map<uint32_t, std::vector<uint32_t>> dataToBroadcast;
+  std::map<std::string, bool> requestsToMarkGloabal;
+  std::map<uint32_t, std::set<std::string>> requestsToMarkWithBid;
 };
 
 

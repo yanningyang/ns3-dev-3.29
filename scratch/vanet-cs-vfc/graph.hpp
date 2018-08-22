@@ -16,7 +16,8 @@
 #include <sstream>
 #include <iomanip>
 #include <algorithm>
-#include "graph-edge-type.h"
+
+#include "custom-type.h"
 
 using namespace std;
 
@@ -44,7 +45,7 @@ struct VertexNode
     this->reqDataIndex = 0;
     this->name = "";
   }
-  VertexNode(uint32_t _fogIndex, const uint32_t& _reqDataIndex)
+  VertexNode(const uint32_t& _fogIndex, const uint32_t& _reqDataIndex)
       : fogIndex(_fogIndex)
       , reqDataIndex(_reqDataIndex)
       , name("")

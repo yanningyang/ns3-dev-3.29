@@ -9,8 +9,9 @@
 #define SCRATCH_VANET_CS_VFC_PACKET_TAG_F2V_H_
 
 #include <vector>
+
+#include "custom-type.h"
 #include "ns3/tag.h"
-#include "graph-edge-type.h"
 
 namespace ns3 {
 namespace vanet {

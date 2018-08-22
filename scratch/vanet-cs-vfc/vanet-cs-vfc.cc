@@ -17,6 +17,7 @@ VanetCsVfcExperiment::VanetCsVfcExperiment ():
     m_i2IPort (4000),
     m_i2VPort (5000),
     m_protocolName ("NONE"),
+    m_schemeName ("cs-vfc"),  // cs-vfc, ncb, genetic
     m_nObuNodes (288),
     m_obuNodes (),
     m_obuTxp (137), // 450m
@@ -44,112 +45,11 @@ VanetCsVfcExperiment::VanetCsVfcExperiment ():
     m_verbose (0),
     m_routingTables (0),
     m_asciiTrace (0),
-    m_pcap (0)
+    m_pcap (0),
+    globalDbSize (100),
+    currentBroadcastId (0),
+    receive_count (0)
 {
-  m_wifiPhyStats = CreateObject<WifiPhyStats> ();
-
-  // set to non-zero value to enable
-  // simply uncond logging during simulation run
-  m_log = 1;
-
-  globalDB.resize(Gloabal_DB_Size);
-  vehsEnterFlag.resize(m_nObuNodes, false);
-
-  vehsInitialReqs.resize(m_nObuNodes);
-  vehsInitialCaches.resize(m_nObuNodes);
-  vehsReqs.resize(m_nObuNodes);
-  vehsReqsStatus.resize(m_nObuNodes);
-  vehsCaches.resize(m_nObuNodes);
-
-  vehsReqsInCloud.resize(m_nObuNodes);
-  vehsReqsStasInCloud.resize(m_nObuNodes);
-  vehsCachesInCloud.resize(m_nObuNodes);
-  vehsMobInfoInCloud.resize(m_nObuNodes);
-
-  fogCluster.resize(m_nRsuNodes);
-  fogsCaches.resize(m_nRsuNodes);
-  fogsReqs.resize(m_nRsuNodes);
-
-  isFirstSubmit.resize(m_nObuNodes, true);
-
-  datasNeededForDecodingPerClique.resize(m_nObuNodes);
-
-  currentBroadcastId = 0;
-
-  receive_count = 0;
-
-  // Initializing global data base
-  for (uint32_t i = 0; i < Gloabal_DB_Size; i++)
-    {
-      globalDB[i] = i;
-    }
-
-  // Initializing vehicle cache and request set
-#if 1
-  Ptr<UniformRandomVariable> urv = CreateObject<UniformRandomVariable>();
-  for (uint32_t i = 0; i < m_nObuNodes; i++)
-    {
-      urv->SetStream(i);
-      uint32_t minLocalSize = Gloabal_DB_Size / 5;
-      uint32_t maxLocalSize = minLocalSize * 1.5;
-      uint32_t localSize = (uint32_t)(urv->GetValue(minLocalSize, maxLocalSize));
-      std::set<uint32_t> vehReq(globalDB.begin(), globalDB.end());
-      std::set<uint32_t> vehCache;
-      for (uint32_t j = 1; j <= localSize; j++)
-	{
-	  uint32_t cacheIdx = (uint32_t)(urv->GetValue(0, Gloabal_DB_Size));
-	  uint32_t data = globalDB[cacheIdx];
-	  vehCache.insert(data);
-	  vehReq.erase(data);
-	}
-      vehsInitialCaches[i] = vehCache;
-      vehsInitialReqs[i] = vehReq;
-    }
-#endif
-
-#if 0
-  // for testing
-  for (uint32_t i = 0; i < m_nObuNodes; i++)
-    {
-//      uint32_t localSize = (uint32_t)(Gloabal_DB_Size / 5);
-      uint32_t localSize = (uint32_t)(Gloabal_DB_Size - 2);
-      std::set<uint32_t> vehReq(globalDB.begin(), globalDB.end());
-      std::set<uint32_t> vehCache;
-      for (uint32_t j = 1; j <= localSize; j++)
-	{
-	  uint32_t cacheIdx = j - 1;
-	  uint32_t data = globalDB[cacheIdx];
-	  vehCache.insert(data);
-	  vehReq.erase(data);
-	}
-      vehsCaches[i] = vehCache;
-      vehsReqs[i] = vehReq;
-    }
-#endif
-
-#if Print_Vehicle_Initial_Request
-  for (uint32_t i = 0; i < m_nObuNodes; i++)
-    {
-      cout << "veh:" << i << ", init reqs:";
-      for(uint32_t req : vehsInitialReqs[i])
-	{
-	  cout << " " << req;
-	}
-      cout << endl;
-    }
-#endif
-
-#if Print_Vehicle_Initial_Cache
-  for (uint32_t i = 0; i < m_nObuNodes; i++)
-    {
-      cout << "veh:" << i << ", init caches:";
-      for(uint32_t cache : vehsInitialCaches[i])
-	{
-	  cout << " " << cache;
-	}
-      cout << endl;
-    }
-#endif
 }
 
 void
@@ -180,7 +80,7 @@ void
 VanetCsVfcExperiment::ParseCommandLineArguments (int argc, char **argv)
 {
   CommandSetup (argc, argv);
-  SetupScenario ();
+  Initialization ();
 
   ConfigureDefaults ();
 }
@@ -373,7 +273,7 @@ VanetCsVfcExperiment::ProcessOutputs ()
 #if Print_Vehicle_Final_Cache
   for (uint32_t i = 0; i < m_nObuNodes; i++)
     {
-      if (vehsCaches[i].size() == Gloabal_DB_Size) continue;
+      if (vehsCaches[i].size() == globalDbSize) continue;
       cout << "veh:" << i << ", final caches:";
       for(uint32_t cache : vehsCaches[i])
 	{
@@ -383,24 +283,40 @@ VanetCsVfcExperiment::ProcessOutputs ()
     }
 #endif
 
-  std::cout << "receive_count: " << receive_count << std::endl;
+  std::ostringstream oss;
+  oss << m_workspacePath << "/result/" << m_schemeName << "-out.txt";
+  m_ofs.open (oss.str(), ios::app);
 
-  std::cout << "SubmittedReqs: " << m_requestStats.GetSubmittedReqs() << std::endl;
-  std::cout << "SatisfiedReqs: " << m_requestStats.GetSatisfiedReqs() << std::endl;
-  std::cout << "BroadcastPkts: " << m_requestStats.GetBroadcastPkts() << std::endl;
-  std::cout << "CumulativeDelay: " << m_requestStats.GetCumulativeDelay() << std::endl;
+  m_ofs << "globalDbSize: " << globalDbSize << std::endl;
+  m_ofs << "receive_count: " << receive_count << std::endl;
+  m_ofs << "SubmittedReqs: " << m_requestStats.GetSubmittedReqs() << std::endl;
+  m_ofs << "SatisfiedReqs: " << m_requestStats.GetSatisfiedReqs() << std::endl;
+  m_ofs << "BroadcastPkts: " << m_requestStats.GetBroadcastPkts() << std::endl;
+  m_ofs << "CumulativeDelay: " << m_requestStats.GetCumulativeDelay() << std::endl;
 
   NS_ASSERT_MSG(m_requestStats.GetSatisfiedReqs() != 0, "number of satisfied request is 0");
-  std::cout << "ASD: " << (m_requestStats.GetCumulativeDelay() / 1e+6) / m_requestStats.GetSatisfiedReqs() << "ms" << std::endl;
+  double ASD = (m_requestStats.GetCumulativeDelay() / 1e+9) / m_requestStats.GetSatisfiedReqs();
+  m_ofs << "ASD: " << ASD << "s" << std::endl;
 
   NS_ASSERT_MSG(m_requestStats.GetSubmittedReqs() != 0, "number of submitted request is 0");
-  std::cout << "SR: " << (double)m_requestStats.GetSatisfiedReqs() / m_requestStats.GetSubmittedReqs() << std::endl;
+  double SR = (double)m_requestStats.GetSatisfiedReqs() / m_requestStats.GetSubmittedReqs();
+  m_ofs << "SR: " << SR << std::endl;
 
   NS_ASSERT_MSG(m_requestStats.GetBroadcastPkts() != 0, "number of broadcast packets is 0");
-  std::cout << "BE: " << m_requestStats.GetSatisfiedReqs() / m_requestStats.GetBroadcastPkts() << std::endl;
+  double BE = (double)m_requestStats.GetSatisfiedReqs() / m_requestStats.GetBroadcastPkts();
+  m_ofs << "BE: " << BE << std::endl;
+  m_ofs << std::endl;
 
-  m_os.close (); // close log file
+  m_ofs.close ();
 
+  std::ostringstream oss1;
+  oss1 << m_workspacePath << "/result/" << m_schemeName << "-out.dat";
+  m_ofs.open (oss1.str(), ios::app);
+//  m_ofs << "DbSize " << "ASD " << "SR " << "BE " << std::endl;
+  m_ofs << globalDbSize << " " << ASD << " " << SR << " " << BE << std::endl;
+  m_ofs.close ();
+
+#if Gen_Gnuplot_File
   Gnuplot plot = Gnuplot (m_plotFileName + ".png");
   plot.SetTerminal ("png");
   plot.SetLegend ("X Values", "Y Values");
@@ -413,6 +329,7 @@ VanetCsVfcExperiment::ProcessOutputs ()
   plot.GenerateOutput (plotFile);
   // Close the plot file.
   plotFile.close ();
+#endif
 }
 
 void
@@ -476,13 +393,13 @@ VanetCsVfcExperiment::LoopPerSecond()
 #if Upload_Enable
   UploadAllVehiclesInfo();
 #endif
-  SubmitAllRequests();
+  SubmitAllVehsRequests();
   UpdateAllFogCluster();
   Simulator::Schedule(Seconds(1.0), &VanetCsVfcExperiment::LoopPerSecond, this);
 }
 
 void
-VanetCsVfcExperiment::SubmitRequests(Ptr<Node> obu)
+VanetCsVfcExperiment::SubmitVehRequests(Ptr<Node> obu)
 {
   uint32_t obuId = obu->GetId();
   uint32_t obuIdx = vehId2IndexMap.at(obuId);
@@ -497,6 +414,13 @@ VanetCsVfcExperiment::SubmitRequests(Ptr<Node> obu)
 	  reqStatus.completed = false;
 	  reqStatus.submitTime = Now().GetDouble();
 	  vehsReqsStatus[obuIdx].insert(make_pair(reqIdx, reqStatus));
+
+	  // NCB scheme
+	  if (m_schemeName.compare("ncb") == 0)
+	    {
+	      ReqQueueItem item(obuIdx, reqIdx);
+	      requestQueue.push_back(item);
+	    }
 	}
 
       m_requestStats.IncSubmittedReqs(vehsReqs[obuIdx].size());
@@ -506,7 +430,7 @@ VanetCsVfcExperiment::SubmitRequests(Ptr<Node> obu)
 }
 
 void
-VanetCsVfcExperiment::SubmitAllRequests()
+VanetCsVfcExperiment::SubmitAllVehsRequests()
 {
   for (NodeContainer::Iterator i = m_obuNodes.Begin (); i != m_obuNodes.End (); ++i)
     {
@@ -516,7 +440,7 @@ VanetCsVfcExperiment::SubmitAllRequests()
 
       if (vehsEnterFlag[obuIdx] == true)
         {
-	  SubmitRequests(obu);
+	  SubmitVehRequests(obu);
         }
     }
 }
@@ -614,6 +538,12 @@ VanetCsVfcExperiment::UpdateAllFogCluster()
 	  if (CalculateDistance (pos_obu, pos_rsu) > Device_Transmission_Range )
 	    {
 	      fogCluster[j].erase(obuIdx);
+
+	      std::map<uint32_t, uint32_t>::iterator iter = vehIdx2FogIdxMap.find(obuIdx);
+	      if (iter != vehIdx2FogIdxMap.end() && iter->second == j)
+		{
+		  vehIdx2FogIdxMap.erase(obuIdx);
+		}
 	    }
 	  else
 	    {
@@ -629,8 +559,15 @@ VanetCsVfcExperiment::UpdateAllFogCluster()
   PrintFogCluster();
 #endif
 
-#if Construct_Graph
-  ConstructGraphAndBroadcast();
+#if Scheduling
+  if (m_schemeName.compare("cs-vfc") == 0)
+    {
+      ConstructGraphAndBroadcast();
+    }
+  else if (m_schemeName.compare("ncb") == 0)
+    {
+      ConstructMostRewardingPktToBroadcast();
+    }
 #endif
 }
 
@@ -873,7 +810,25 @@ VanetCsVfcExperiment::Decode (bool isEncoded, uint32_t broadcastId)
 
 		  RecordStats(obuIdx, vertex.reqDataIndex);
 
-		  RemoveDataFromNeededDatas4Decoding (obuIdx, vertex.reqDataIndex);
+		  map<uint32_t, std::set<uint32_t>>::iterator iter = datasNeededForDecodingPerClique[obuIdx].begin();
+		  for (; iter != datasNeededForDecodingPerClique[obuIdx].end(); iter++)
+		    {
+		      iter->second.erase(vertex.reqDataIndex);
+		      if (iter->second.size() == 0)
+			{
+			  if (fogIdx2FogReqInCliqueMaps.count(iter->first)
+			      && fogIdx2FogReqInCliqueMaps.at(iter->first).count(vertex.fogIndex))
+			    {
+			      uint32_t fogReqIdx = fogIdx2FogReqInCliqueMaps.at(iter->first).at(vertex.fogIndex);
+			      if (vehsReqs[obuIdx].count(fogReqIdx) != 0)
+				{
+				  vehsReqs[obuIdx].erase(fogReqIdx);
+				  vehsCaches[obuIdx].insert(fogReqIdx);
+				  RecordStats(obuIdx, fogReqIdx);
+				}
+			    }
+			}
+		    }
 		}
 	    }
 
@@ -1183,32 +1138,164 @@ void VanetCsVfcExperiment::RecordStats (uint32_t obuIdx, uint32_t dataIdx)
   m_requestStats.IncCumulativeDelay(it->second.satisfiedTime - it->second.submitTime);
 }
 
-void VanetCsVfcExperiment::RemoveDataFromNeededDatas4Decoding (uint32_t obuIdx, uint32_t dataIdx)
+void
+VanetCsVfcExperiment::ConstructMostRewardingPktToBroadcast ()
 {
-  map<uint32_t, std::set<uint32_t>>::iterator iter = datasNeededForDecodingPerClique[obuIdx].begin();
-  iter->second.erase(dataIdx);
-  for (; iter != datasNeededForDecodingPerClique[obuIdx].end(); iter++)
-    {
-    }
-}
+  if (requestQueue.empty()) return;
 
-void VanetCsVfcExperiment::DecodeFogReq (uint32_t obuIdx, uint32_t fogReqIdx, uint32_t broadcastId)
-{
-  map<uint32_t, std::set<uint32_t>>::iterator it = datasNeededForDecodingPerClique[obuIdx].find(broadcastId);
-  NS_ASSERT (it != datasNeededForDecodingPerClique[obuIdx].end());
-  if (it->second.size() == 0)
+  std::list<ReqQueueItem>::iterator iter_list = requestQueue.begin();
+  while (iter_list != requestQueue.end() && requestsToMarkGloabal[iter_list->name])
     {
-      if (vehsCaches[obuIdx].count(fogReqIdx) == 0)
+      iter_list++;
+    }
+  if (iter_list == requestQueue.end()) return;
+
+  currentBroadcastId++;
+  reqQueHead[currentBroadcastId] = *iter_list;
+
+  uint32_t maxNum = 0;
+  std::vector<uint32_t> dataSet;
+  dataSet.push_back(reqQueHead[currentBroadcastId].reqDataIndex);
+  dataToBroadcast[currentBroadcastId] = dataSet;
+
+  std::set<uint32_t> vehIdxTraversed;
+
+  std::list<ReqQueueItem>::iterator iter = requestQueue.begin();
+  for (; iter != requestQueue.end(); iter++)
+    {
+      if (vehIdxTraversed.count(iter->vehIndex)) continue;
+      if (requestsToMarkGloabal[iter->name]) continue;
+      if (requestsToMarkWithBid[currentBroadcastId].count(iter->name)) continue;
+
+      if (reqQueHead[currentBroadcastId].reqDataIndex == iter->reqDataIndex)
 	{
-	  vehsCaches[obuIdx].insert(fogReqIdx);
-	}
-      if (vehsReqs[obuIdx].count(fogReqIdx) != 0)
-	{
-	  vehsReqs[obuIdx].erase(fogReqIdx);
-	  RecordStats(obuIdx, fogReqIdx);
-	  RemoveDataFromNeededDatas4Decoding (obuIdx, fogReqIdx);
+	  maxNum += 1;
+	  std::set<uint32_t> vehSet;
+	  vehSet.insert(iter->vehIndex);
+	  vehsToSatisfy[currentBroadcastId] = vehSet;
+	  requestsToMarkWithBid[currentBroadcastId].insert(iter->name);
+//	  requestsToMarkGloabal[iter->name] = true;
+
+	  vehIdxTraversed.insert(iter->vehIndex);
 	}
     }
+
+//  std::map<uint32_t, uint32_t>::iterator iter1 = vehIdx2FogIdxMap.begin();
+//  cout << "vehIdx2FogIdxMap:";
+//  for (; iter1 != vehIdx2FogIdxMap.end(); iter1++)
+//    {
+//      cout << " " << iter1->first << "=" << iter1->second;
+//    }
+//  cout << endl;
+
+  std::set<uint32_t> caches;
+  if (!vehIdx2FogIdxMap.count(reqQueHead[currentBroadcastId].vehIndex))
+    {
+      caches = vehsCaches[reqQueHead[currentBroadcastId].vehIndex];
+    }
+  else
+    {
+      caches = fogsCaches[vehIdx2FogIdxMap.at(reqQueHead[currentBroadcastId].vehIndex)];
+    }
+
+  uint32_t data2ToBroadcast;
+  bool flag = false;
+  for (uint32_t cache : caches)
+    {
+      uint32_t maxNumEncode = 0;
+      std::set<uint32_t> clientsToSatisfyEncode;
+      std::set<std::string> requestsToMarkTmpEncode;
+      std::set<uint32_t> vehIdxTraversedEncode;
+
+      iter = requestQueue.begin();
+      for (; iter != requestQueue.end(); iter++)
+	{
+	  if (vehIdxTraversedEncode.count(iter->vehIndex)) continue;
+	  if (requestsToMarkGloabal[iter->name]) continue;
+	  if (requestsToMarkTmpEncode.count(iter->name)) continue;
+
+	  std::set<uint32_t> caches2;
+	  if (!vehIdx2FogIdxMap.count(iter->vehIndex))
+	    {
+	      caches2 = vehsCaches[iter->vehIndex];
+	    }
+	  else
+	    {
+	      caches2 = fogsCaches[vehIdx2FogIdxMap.at(iter->vehIndex)];
+	    }
+	  if (reqQueHead[currentBroadcastId].reqDataIndex == iter->reqDataIndex && caches2.count(cache))
+	    {
+	      maxNumEncode += 1;
+	      clientsToSatisfyEncode.insert(iter->vehIndex);
+	      requestsToMarkTmpEncode.insert(iter->name);
+
+	      vehIdxTraversedEncode.insert(iter->vehIndex);
+	    }
+	  else if (cache == iter->reqDataIndex && caches2.count(reqQueHead[currentBroadcastId].reqDataIndex))
+	    {
+	      maxNumEncode += 1;
+	      clientsToSatisfyEncode.insert(iter->vehIndex);
+	      requestsToMarkTmpEncode.insert(iter->name);
+
+	      vehIdxTraversedEncode.insert(iter->vehIndex);
+	    }
+	}
+      if (maxNumEncode > maxNum)
+	{
+	  flag = true;
+//	  cout << Now().GetSeconds() << ", maxNumEncode:" << maxNumEncode << ", maxNum:" << maxNum << endl;
+	  maxNum = maxNumEncode;
+	  vehsToSatisfy[currentBroadcastId] = clientsToSatisfyEncode;
+	  requestsToMarkWithBid[currentBroadcastId] = requestsToMarkTmpEncode;
+	  data2ToBroadcast = cache;
+	}
+    }
+
+  for (std::string name : requestsToMarkWithBid[currentBroadcastId])
+    {
+      requestsToMarkGloabal[name] = true;
+    }
+  if (flag)
+    {
+      dataToBroadcast[currentBroadcastId].push_back(data2ToBroadcast);
+    }
+
+  cout << Now().GetSeconds() << ", maxNum:" << maxNum;
+  cout << ", dataToBroadcast" << "[" << currentBroadcastId << "]" << ":";
+  for (uint32_t data : dataToBroadcast[currentBroadcastId])
+    {
+      cout << " " << data;
+    }
+//  cout << ", vehsToSatisfy";
+//  for (uint32_t veh : vehsToSatisfy)
+//    {
+//      cout << " " << veh;
+//    }
+  cout << endl;
+
+  m_requestStats.IncBroadcastPkts();
+
+  Ptr<UdpSender> sender = CreateObject<UdpSender>();
+  sender->SetNode(m_remoteHost);
+  sender->SetRemote(Ipv4Address ("10.2.255.255"), m_dlPort);
+  sender->SetDataSize(Packet_Size);
+  sender->Start();
+  using vanet::PacketHeader;
+  PacketHeader header;
+  header.SetType(PacketHeader::MessageType::DATA_C2V);
+  header.SetBroadcastId(currentBroadcastId);
+  sender->SetHeader(header);
+
+  using vanet::PacketTagC2v;
+  PacketTagC2v *pktTag = new PacketTagC2v();
+  std::vector<uint32_t> reqsIds;
+  reqsIds.assign(dataToBroadcast[currentBroadcastId].begin(), dataToBroadcast[currentBroadcastId].end());
+  pktTag->SetReqsIds(reqsIds);
+  sender->SetPacketTag(pktTag);
+
+  Simulator::ScheduleNow (&UdpSender::Send, sender);
+
+//  requestQueue.pop_front();
 }
 
 void
@@ -1233,6 +1320,9 @@ VanetCsVfcExperiment::CommandSetup (int argc, char **argv)
 
   cmd.AddValue ("asciiTrace", "Dump ASCII Trace data", m_asciiTrace);
   cmd.AddValue ("pcap", "Create PCAP files for all nodes", m_pcap);
+
+  cmd.AddValue ("schemeName", "scheduling algorithm name", m_schemeName);
+  cmd.AddValue ("globalDbSize", "size of global database", globalDbSize);
 
   cmd.Parse (argc, argv);
 }
@@ -1656,6 +1746,30 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
 
 //  Ptr<Node> node = NodeList::GetNode(nodeId);
 
+  if (m_schemeName.compare("cs-vfc") == 0)
+    {
+      ReceivePacketOnSchemeCsVfc (nodeId, packet, srcAddr, destAddr);
+    }
+  else if (m_schemeName.compare("ncb") == 0)
+    {
+      ReceivePacketOnSchemeNcb (nodeId, packet, srcAddr, destAddr);
+    }
+}
+
+void
+VanetCsVfcExperiment::ReceivePacketOnSchemeCsVfc (uint32_t nodeId, Ptr<const Packet> packet, const Address & srcAddr, const Address & destAddr)
+{
+//  receive_count++;
+//
+//  size_t start = context.find("/", 0);
+//  start = context.find("/", start + 1);
+//  size_t end = context.find("/", start + 1);
+//  std::string nodeIdStr = context.substr(start + 1, end - start - 1);
+//  uint32_t nodeId = 0;
+//  sscanf(nodeIdStr.c_str(), "%d", &nodeId);
+//
+////  Ptr<Node> node = NodeList::GetNode(nodeId);
+//
   std::ostringstream oss;
   oss << "sim time:" <<Simulator::Now ().GetSeconds () << ", clock: " << (double)(clock()) / CLOCKS_PER_SEC;
 #if Print_Log_Header_On_Receive
@@ -2009,35 +2123,7 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
       uint32_t broadcastId = recvHeader.GetBroadcastId();
       EdgeType edgeType = pktTagF2v.GetCurrentEdgeType();
       PacketTagF2v::NextActionType nextAction = pktTagF2v.GetNextActionType();
-      if (edgeType == EdgeType::NOT_SET)
-	{
-#if Print_Edge_Type
-	  oss << " EdgeType::NOT_SET ";
-#endif
-	  if (fogIdx2FogReqInCliqueMaps.count(broadcastId) == 0) return;
-	  uint32_t fogReqIdx = fogIdx2FogReqInCliqueMaps.at(broadcastId).at(fogIdx);
-	  std::vector<uint32_t> dataIdxs = pktTagF2v.GetDataIdxs();
-	  for (uint32_t dataIdx : dataIdxs)
-	    {
-	      if (vehsReqs[obuIdx].count(fogReqIdx) != 0)
-		{
-		  if (vehsCaches[obuIdx].count(dataIdx) == 0)
-		    {
-		      vehsCaches[obuIdx].insert(dataIdx);
-		      map<uint32_t, std::set<uint32_t>>::iterator iter = datasNeededForDecodingPerClique[obuIdx].find(broadcastId);
-		      NS_ASSERT (iter != datasNeededForDecodingPerClique[obuIdx].end());
-		      iter->second.erase(dataIdx);
-		    }
-		  if (vehsReqs[obuIdx].count(dataIdx) != 0)
-		    {
-		      vehsReqs[obuIdx].erase(dataIdx);
-		      RecordStats(obuIdx, dataIdx);
-		    }
-		  DecodeFogReq (obuIdx, fogReqIdx, broadcastId);
-		}
-	    }
-	}
-      else if (edgeType == EdgeType::CONDITION_1)
+      if (edgeType == EdgeType::CONDITION_1)
 	{
 #if Print_Edge_Type
 	  oss << " EdgeType::CONDITION_1 ";
@@ -2184,7 +2270,256 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
 	    }
 	}
     }
-  NS_LOG_UNCOND(oss.str ());
+#if Print_Received_Log
+  NS_LOG_UNCOND(oss.str());
+#endif
+}
+
+void
+VanetCsVfcExperiment::ReceivePacketOnSchemeNcb (uint32_t nodeId, Ptr<const Packet> packet, const Address & srcAddr, const Address & destAddr)
+{
+  std::ostringstream oss;
+  oss << "sim time:" <<Simulator::Now ().GetSeconds () << ", clock: " << (double)(clock()) / CLOCKS_PER_SEC;
+#if Print_Log_Header_On_Receive
+  if (InetSocketAddress::IsMatchingType (srcAddr))
+    {
+      InetSocketAddress inetSrcAddr = InetSocketAddress::ConvertFrom (srcAddr);
+      oss << " src: " << inetSrcAddr.GetIpv4 ();
+    }
+  if (InetSocketAddress::IsMatchingType (destAddr))
+    {
+      InetSocketAddress inetDestAddr = InetSocketAddress::ConvertFrom (destAddr);
+      oss << " dest: " << inetDestAddr.GetIpv4 ();
+    }
+#endif
+
+  using vanet::PacketHeader;
+  PacketHeader recvHeader;
+  Ptr<Packet> pktCopy = packet->Copy();
+  pktCopy->RemoveHeader(recvHeader);
+
+  oss << " bId: " << recvHeader.GetBroadcastId();
+
+  if (recvHeader.GetType() == PacketHeader::MessageType::DATA_C2V)
+    {
+#if Print_Msg_Type
+      oss << " MessageType::DATA_C2V ";
+#endif
+
+      uint32_t obuIdx = vehId2IndexMap.at(nodeId);
+
+      using vanet::PacketTagC2v;
+      PacketTagC2v pktTagC2v;
+      pktCopy->RemovePacketTag(pktTagC2v);
+      std::vector<uint32_t> datasIdxBroadcast = pktTagC2v.GetReqsIds();
+      uint32_t broadcastDataNum = datasIdxBroadcast.size();
+
+      if (broadcastDataNum == 0) return;
+
+      // Judging whether the broadcasted data is encoded or not
+      bool isEncoded = broadcastDataNum == 1 ? false : true;
+      if (!isEncoded)
+	{
+	  uint32_t dataIdx = datasIdxBroadcast[0];
+	  if (vehsReqs[obuIdx].count(dataIdx))
+	    {
+	      vehsCaches[obuIdx].insert(dataIdx);
+	      vehsReqs[obuIdx].erase(dataIdx);
+	      RecordStats(obuIdx, dataIdx);
+
+	      ReqQueueItem item(obuIdx, dataIdx);
+	      requestQueue.erase(std::find(requestQueue.begin(), requestQueue.end(), item));
+	    }
+	}
+      else
+	{
+	  if (vehsToSatisfy[recvHeader.GetBroadcastId()].count(obuIdx))
+	    {
+	      uint32_t dataIdx1 = datasIdxBroadcast[0];
+	      uint32_t dataIdx2 = datasIdxBroadcast[1];
+	      if (vehsReqs[obuIdx].count(dataIdx1) && vehsCaches[obuIdx].count(dataIdx2))
+		{
+		  vehsCaches[obuIdx].insert(dataIdx1);
+		  vehsReqs[obuIdx].erase(dataIdx1);
+		  RecordStats(obuIdx, dataIdx1);
+
+		  ReqQueueItem item(obuIdx, dataIdx1);
+		  requestQueue.erase(std::find(requestQueue.begin(), requestQueue.end(), item));
+		}
+	      else if (vehsReqs[obuIdx].count(dataIdx2) && vehsCaches[obuIdx].count(dataIdx1))
+		{
+		  vehsCaches[obuIdx].insert(dataIdx2);
+		  vehsReqs[obuIdx].erase(dataIdx2);
+		  RecordStats(obuIdx, dataIdx2);
+
+		  ReqQueueItem item(obuIdx, dataIdx2);
+		  requestQueue.erase(std::find(requestQueue.begin(), requestQueue.end(), item));
+		}
+	      else if (vehsReqs[obuIdx].count(dataIdx1) && vehsCaches[obuIdx].count(dataIdx2) == 0)
+		{
+		  bool flag = true;
+		  if (vehIdx2FogIdxMap.count(obuIdx))
+		    {
+		      uint32_t fogIdx = vehIdx2FogIdxMap.at(obuIdx);
+		      if (fogsCaches[fogIdx].count(dataIdx2))
+			{
+			  for (uint32_t fogVehIdx : fogCluster[fogIdx])
+			    {
+			      if (vehsCaches[fogVehIdx].count(dataIdx2))
+				{
+				  Ptr<UdpSender> sender = CreateObject<UdpSender>();
+				  sender->SetNode(NodeList::GetNode(nodeId));
+				  sender->SetRemote(m_rsu80211pInterfaces.GetAddress(fogIdx), m_v2IPort);
+				  sender->SetDataSize(Packet_Size);
+				  sender->Start();
+				  using vanet::PacketHeader;
+				  PacketHeader header;
+				  header.SetType(PacketHeader::MessageType::DATA_V2F);
+				  header.SetBroadcastId(recvHeader.GetBroadcastId());
+				  sender->SetHeader(header);
+
+				  using vanet::PacketTagV2f;
+				  PacketTagV2f *pktTagV2f = new PacketTagV2f();
+				  pktTagV2f->SetNextActionType(PacketTagV2f::NextActionType::F2V);
+				  std::vector<uint32_t> dataIdxs;
+				  dataIdxs.push_back(dataIdx2);
+				  pktTagV2f->SetDataIdxs(dataIdxs);
+				  sender->SetPacketTag(pktTagV2f);
+
+				  Simulator::ScheduleNow (&UdpSender::Send, sender);
+				  break;
+				}
+			    }
+			}
+		      else
+			{
+			  flag = false;
+			}
+		    }
+		  else
+		    {
+		      flag = false;
+		    }
+		  if (!flag)
+		    {
+		      std::ostringstream oss;
+		      oss << obuIdx << "-" << dataIdx1;
+		      requestsToMarkGloabal[oss.str()] = false;
+		    }
+		}
+	      else if (vehsReqs[obuIdx].count(dataIdx2) && vehsCaches[obuIdx].count(dataIdx1) == 0)
+		{
+		  bool flag = true;
+		  if (vehIdx2FogIdxMap.count(obuIdx))
+		    {
+		      uint32_t fogIdx = vehIdx2FogIdxMap.at(obuIdx);
+		      if (fogsCaches[fogIdx].count(dataIdx1))
+			{
+			  for (uint32_t fogVehIdx : fogCluster[fogIdx])
+			    {
+			      if (vehsCaches[fogVehIdx].count(dataIdx1))
+				{
+				  Ptr<UdpSender> sender = CreateObject<UdpSender>();
+				  sender->SetNode(NodeList::GetNode(nodeId));
+				  sender->SetRemote(m_rsu80211pInterfaces.GetAddress(fogIdx), m_v2IPort);
+				  sender->SetDataSize(Packet_Size);
+				  sender->Start();
+				  using vanet::PacketHeader;
+				  PacketHeader header;
+				  header.SetType(PacketHeader::MessageType::DATA_V2F);
+				  header.SetBroadcastId(recvHeader.GetBroadcastId());
+				  sender->SetHeader(header);
+
+				  using vanet::PacketTagV2f;
+				  PacketTagV2f *pktTagV2f = new PacketTagV2f();
+				  pktTagV2f->SetNextActionType(PacketTagV2f::NextActionType::F2V);
+				  std::vector<uint32_t> dataIdxs;
+				  dataIdxs.push_back(dataIdx1);
+				  pktTagV2f->SetDataIdxs(dataIdxs);
+				  sender->SetPacketTag(pktTagV2f);
+
+				  Simulator::ScheduleNow (&UdpSender::Send, sender);
+				  break;
+				}
+			    }
+			}
+		      else
+			{
+			  flag = false;
+			}
+		    }
+		  else
+		    {
+		      flag = false;
+		    }
+		  if (!flag)
+		    {
+		      std::ostringstream oss;
+		      oss << obuIdx << "-" << dataIdx2;
+		      requestsToMarkGloabal[oss.str()] = false;
+		    }
+		}
+	    }
+	}
+
+      dataToBroadcast.erase(recvHeader.GetBroadcastId());
+    }
+  else if (recvHeader.GetType() == PacketHeader::MessageType::DATA_V2F)
+    {
+#if Print_Msg_Type
+      oss << " MessageType::DATA_V2F ";
+#endif
+      using vanet::PacketTagF2f;
+      PacketTagF2f pktTagF2f;
+      pktCopy->RemovePacketTag(pktTagF2f);
+
+      Ptr<UdpSender> sender = CreateObject<UdpSender>();
+      sender->SetNode(NodeList::GetNode(nodeId));
+      sender->SetRemote(Ipv4Address ("10.3.255.255"), m_i2VPort);
+      sender->SetDataSize(Packet_Size);
+      sender->Start();
+      using vanet::PacketHeader;
+      PacketHeader header;
+      header.SetType(PacketHeader::MessageType::DATA_F2V);
+      header.SetBroadcastId(recvHeader.GetBroadcastId());
+      sender->SetHeader(header);
+
+      using vanet::PacketTagF2v;
+      PacketTagF2v *pktTagF2v = new PacketTagF2v();
+      pktTagF2v->SetNextActionType(PacketTagF2v::NextActionType::NOT_SET);
+      pktTagF2v->SetFogId(nodeId);
+      pktTagF2v->SetDataIdxs(pktTagF2f.GetDataIdxs());
+      sender->SetPacketTag(pktTagF2v);
+
+      Simulator::ScheduleNow (&UdpSender::Send, sender);
+    }
+  else if (recvHeader.GetType() == PacketHeader::MessageType::DATA_F2V)
+    {
+#if Print_Msg_Type
+      oss << " MessageType::DATA_F2V ";
+#endif
+      using vanet::PacketTagF2v;
+      PacketTagF2v pktTagF2v;
+      pktCopy->RemovePacketTag(pktTagF2v);
+//      std::vector<uint32_t> datasIdx = pktTagF2v.GetDataIdxs();
+      uint32_t obuIdx = vehId2IndexMap.at(nodeId);
+      if (vehsToSatisfy[recvHeader.GetBroadcastId()].count(obuIdx))
+	{
+//	  uint32_t dataIdx = datasIdx[0];
+	  if (vehsReqs[obuIdx].count(reqQueHead[recvHeader.GetBroadcastId()].reqDataIndex))
+	    {
+	      vehsCaches[obuIdx].insert(reqQueHead[recvHeader.GetBroadcastId()].reqDataIndex);
+	      vehsReqs[obuIdx].erase(reqQueHead[recvHeader.GetBroadcastId()].reqDataIndex);
+	      RecordStats(obuIdx, reqQueHead[recvHeader.GetBroadcastId()].reqDataIndex);
+
+	      ReqQueueItem item(obuIdx, reqQueHead[recvHeader.GetBroadcastId()].reqDataIndex);
+	      requestQueue.erase(std::find(requestQueue.begin(), requestQueue.end(), item));
+	    }
+	}
+    }
+#if Print_Received_Log
+  NS_LOG_UNCOND(oss.str());
+#endif
 }
 
 void
@@ -2195,16 +2530,104 @@ VanetCsVfcExperiment::OnOffTrace (std::string context, Ptr<const Packet> packet)
 }
 
 void
-VanetCsVfcExperiment::SetupScenario ()
+VanetCsVfcExperiment::Initialization ()
 {
-//  m_nObuNodes = 288;
-//  m_obuTxp = 35.0; // 300m
-//  m_nRsuNodes = 16;
-//  m_rsuTxp = 35.0; // 31:300m, 35:400m, 36: 500m, 38: 600m, 45: 1000m
-//
-//  m_mobilityFile = m_workspacePath + "/mobility" + "/mobility.tcl";
-//  m_mobLogFile = m_workspacePath + "/mobility.log";
-//  m_TotalSimTime = 315.01;
+  m_wifiPhyStats = CreateObject<WifiPhyStats> ();
+
+  globalDB.resize(globalDbSize);
+  vehsEnterFlag.resize(m_nObuNodes, false);
+
+  vehsInitialReqs.resize(m_nObuNodes);
+  vehsInitialCaches.resize(m_nObuNodes);
+  vehsReqs.resize(m_nObuNodes);
+  vehsReqsStatus.resize(m_nObuNodes);
+  vehsCaches.resize(m_nObuNodes);
+
+  vehsReqsInCloud.resize(m_nObuNodes);
+  vehsReqsStasInCloud.resize(m_nObuNodes);
+  vehsCachesInCloud.resize(m_nObuNodes);
+  vehsMobInfoInCloud.resize(m_nObuNodes);
+
+  fogCluster.resize(m_nRsuNodes);
+  fogsCaches.resize(m_nRsuNodes);
+  fogsReqs.resize(m_nRsuNodes);
+
+  isFirstSubmit.resize(m_nObuNodes, true);
+
+  datasNeededForDecodingPerClique.resize(m_nObuNodes);
+
+  // Initializing global data base
+  for (uint32_t i = 0; i < globalDbSize; i++)
+    {
+      globalDB[i] = i;
+    }
+
+  // Initializing vehicle cache and request set
+#if 1
+  Ptr<UniformRandomVariable> urv = CreateObject<UniformRandomVariable>();
+  for (uint32_t i = 0; i < m_nObuNodes; i++)
+    {
+      urv->SetStream(i);
+      uint32_t minLocalSize = globalDbSize / 5;
+      uint32_t maxLocalSize = minLocalSize * 1.5;
+      uint32_t localSize = (uint32_t)(urv->GetValue(minLocalSize, maxLocalSize));
+      std::set<uint32_t> vehReq(globalDB.begin(), globalDB.end());
+      std::set<uint32_t> vehCache;
+      for (uint32_t j = 1; j <= localSize; j++)
+	{
+	  uint32_t cacheIdx = (uint32_t)(urv->GetValue(0, globalDbSize));
+	  uint32_t data = globalDB[cacheIdx];
+	  vehCache.insert(data);
+	  vehReq.erase(data);
+	}
+      vehsInitialCaches[i] = vehCache;
+      vehsInitialReqs[i] = vehReq;
+    }
+#endif
+
+#if 0
+  // for testing
+  for (uint32_t i = 0; i < m_nObuNodes; i++)
+    {
+//      uint32_t localSize = (uint32_t)(globalDbSize / 5);
+      uint32_t localSize = (uint32_t)(globalDbSize - 2);
+      std::set<uint32_t> vehReq(globalDB.begin(), globalDB.end());
+      std::set<uint32_t> vehCache;
+      for (uint32_t j = 1; j <= localSize; j++)
+	{
+	  uint32_t cacheIdx = j - 1;
+	  uint32_t data = globalDB[cacheIdx];
+	  vehCache.insert(data);
+	  vehReq.erase(data);
+	}
+      vehsCaches[i] = vehCache;
+      vehsReqs[i] = vehReq;
+    }
+#endif
+
+#if Print_Vehicle_Initial_Request
+  for (uint32_t i = 0; i < m_nObuNodes; i++)
+    {
+      cout << "veh:" << i << ", init reqs:";
+      for(uint32_t req : vehsInitialReqs[i])
+	{
+	  cout << " " << req;
+	}
+      cout << endl;
+    }
+#endif
+
+#if Print_Vehicle_Initial_Cache
+  for (uint32_t i = 0; i < m_nObuNodes; i++)
+    {
+      cout << "veh:" << i << ", init caches:";
+      for(uint32_t cache : vehsInitialCaches[i])
+	{
+	  cout << " " << cache;
+	}
+      cout << endl;
+    }
+#endif
 }
 
 int

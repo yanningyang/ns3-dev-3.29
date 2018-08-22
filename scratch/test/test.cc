@@ -19,6 +19,7 @@
 #include "graph.hpp"
 #include "byte-buffer.h"
 #include "stats.h"
+#include "custom-type.h"
 
 using namespace ns3;
 
@@ -99,34 +100,71 @@ main (int argc, char *argv[])
   }
 #endif
 
-  std::set<uint32_t> haha;
-  std::set<uint32_t> hehe;
+//  std::set<uint32_t> haha;
+//  std::set<uint32_t> hehe;
+//  for (uint32_t i = 0; i < 10; i++)
+//    {
+//      haha.insert(i);
+//    }
+//  hehe.insert(2);
+//  hehe.insert(4);
+//  hehe.insert(6);
+//
+//  std::set<uint32_t>::iterator iter = haha.begin();
+//  for (; iter != haha.end(); iter++)
+//    {
+//      cout << " " << *iter;
+//    }
+//  cout << endl;
+//
+//  std::set<uint32_t>::iterator iter2 = hehe.begin();
+//  for (; iter2 != hehe.end(); iter2++)
+//    {
+//      haha.erase(*iter2);
+//    }
+//
+//  iter = haha.begin();
+//  for (; iter != haha.end(); iter++)
+//    {
+//      cout << " " << *iter;
+//    }
+//  cout << endl;
+
+  std::list<ReqQueueItem> requestQueue;
   for (uint32_t i = 0; i < 10; i++)
     {
-      haha.insert(i);
+      ReqQueueItem item(i, i);
+      requestQueue.push_back(item);
     }
-  hehe.insert(2);
-  hehe.insert(4);
-  hehe.insert(6);
-
-  std::set<uint32_t>::iterator iter = haha.begin();
-  for (; iter != haha.end(); iter++)
+  std::list<ReqQueueItem>::iterator iter = requestQueue.begin();
+  for (; iter != requestQueue.end(); iter++)
     {
       cout << " " << *iter;
     }
   cout << endl;
 
-  std::set<uint32_t>::iterator iter2 = hehe.begin();
-  for (; iter2 != hehe.end(); iter2++)
-    {
-      haha.erase(*iter2);
-    }
+  ReqQueueItem item(2, 2);
+  requestQueue.erase(std::find(requestQueue.begin(), requestQueue.end(), item));
+  ReqQueueItem item2(3, 3);
+  requestQueue.erase(std::find(requestQueue.begin(), requestQueue.end(), item2));
 
-
-  iter = haha.begin();
-  for (; iter != haha.end(); iter++)
+  iter = requestQueue.begin();
+  for (; iter != requestQueue.end(); iter++)
     {
       cout << " " << *iter;
     }
   cout << endl;
+
+  std::ofstream ofs;
+  std::string m_workspacePath = "/home/haha/ns3.29-dev-workspace/workspace/vanet-cs-vfc";
+  std::ostringstream oss;
+  oss << m_workspacePath << "/result/test.txt";
+  ofs.open (oss.str(), ios::app);
+  ofs << "haha" << endl;
+  ofs.close();
+  ofs.open (oss.str(), ios::app);
+  ofs << "hehe" << endl;
+  ofs.close();
+
+
 }
