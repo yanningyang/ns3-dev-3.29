@@ -166,6 +166,33 @@ main (int argc, char *argv[])
       return -1;
   }
 
+  mwSize dims[3] = {3, 2, 2};
+  mwArray mwT(3, dims, mxDOUBLE_CLASS);
+  double data[12] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+  mwT.SetData(data, 12);
+
+  std::cout << "dims="<<mwT.GetDimensions()<<std::endl;
+
+//  std::cout << "mwT(1,1,1)="<<mwT.Get(3, 1, 1, 1)<<std::endl;
+//  std::cout << "mwT(1,1,2)="<<mwT.Get(3, 1, 1, 2)<<std::endl;
+//  std::cout << "mwT(1,2,1)="<<mwT.Get(3, 1, 2, 1)<<std::endl;
+//  std::cout << "mwT(1,2,2)="<<mwT.Get(3, 1, 2, 2)<<std::endl;
+
+  std::cout << "mwT(1,1,1)="<<mwT(1, 1, 1)<<std::endl;
+  std::cout << "mwT(1,1,2)="<<mwT(1, 1, 2)<<std::endl;
+  std::cout << "mwT(1,2,1)="<<mwT(1, 2, 1)<<std::endl;
+  std::cout << "mwT(1,2,2)="<<mwT(1, 2, 2)<<std::endl;
+
+  std::cout << "mwT(2,1,1)="<<mwT(2, 1, 1)<<std::endl;
+  std::cout << "mwT(2,1,2)="<<mwT(2, 1, 2)<<std::endl;
+  std::cout << "mwT(2,2,1)="<<mwT(2, 2, 1)<<std::endl;
+  std::cout << "mwT(2,2,2)="<<mwT(2, 2, 2)<<std::endl;
+
+  std::cout << "mwT(3,1,1)="<<mwT(3, 1, 1)<<std::endl;
+  std::cout << "mwT(3,1,2)="<<mwT(3, 1, 2)<<std::endl;
+  std::cout << "mwT(3,2,1)="<<mwT(3, 2, 1)<<std::endl;
+  std::cout << "mwT(3,2,2)="<<mwT(3, 2, 2)<<std::endl;
+
 //  MA();
 
   libMATerminate();

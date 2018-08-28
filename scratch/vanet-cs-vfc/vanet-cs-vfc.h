@@ -35,14 +35,18 @@
 #include "packet-tag-f2f.h"
 #include "packet-tag-f2v.h"
 #include "stats.h"
+#include <mclmcrrt.h>
+#include <mclcppclass.h>
+#include <matrix.h>
+#include "libMA.h"
 
 NS_LOG_COMPONENT_DEFINE ("vanet-cs-vfc");
 
 #define Output_Animation 					false
 #define Gen_Gnuplot_File					false
 
-#define Lte_Enable 						true	// turn on/off LTE
-#define Upload_Enable 						true
+#define Lte_Enable 						false	// turn on/off LTE
+#define Upload_Enable 						false
 #define Cloud_Enable 						true
 #define Print_Log_Header_On_Receive 				true
 #define Print_Msg_Type 						true
@@ -64,6 +68,7 @@ NS_LOG_COMPONENT_DEFINE ("vanet-cs-vfc");
 #define Construct_Graph_And_Find_Clique_Time_stas 		false
 
 #define Device_Transmission_Range 				450
+#define BS_Transmission_Range 					2125
 #define Num_Cliques 						3
 #define Packet_Size 						1024
 #define Total_Sim_Time 						581.01
@@ -74,7 +79,7 @@ NS_LOG_COMPONENT_DEFINE ("vanet-cs-vfc");
 
 #define Scheme_1						"cs-vfc"
 #define Scheme_2						"ncb"
-#define Scheme_3						"genetic"
+#define Scheme_3						"ma"
 
 #define Test_Bid						54
 
@@ -342,6 +347,8 @@ private:
   void ConstructGraphAndBroadcast ();
 
   void ConstructMostRewardingPktToBroadcast ();
+
+  void MAandBroadcast ();
 
   void ResetStatusAndSend (Ptr<UdpSender> sender);
 

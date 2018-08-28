@@ -614,21 +614,25 @@ VanetCsVfcExperiment::UploadAllVehiclesInfo()
   for (NodeContainer::Iterator i = m_obuNodes.Begin (); i != m_obuNodes.End (); ++i)
     {
       Ptr<Node> obu = (*i);
-//      uint32_t obuId = obu->GetId();
-//      uint32_t obuIdx = vehId2IndexMap.at(obuId);
-//
-//      if (vehsEnterFlag[obuIdx] == true)
-//        {
-//	  UploadVehicleInfo(obu);
-//        }
-      UploadVehicleInfo(obu);
+      uint32_t obuId = obu->GetId();
+      uint32_t obuIdx = vehId2IndexMap.at(obuId);
+
+      if (vehsEnterFlag[obuIdx] == true)
+        {
+	  UploadVehicleInfo(obu);
+        }
+      // for test
+//      UploadVehicleInfo(obu);
     }
 }
 
 void
 VanetCsVfcExperiment::UpdateAllFogCluster()
 {
-  // update vehicle set in every fog
+  Ptr<Node> bs = m_remoteHost;
+  Ptr<MobilityModel> bsMobility = bs->GetObject<MobilityModel> ();
+  Vector pos_bs = bsMobility->GetPosition ();
+
   for (uint32_t i = 0; i < m_nObuNodes; i++)
     {
       uint32_t obuIdx = i;
@@ -639,6 +643,18 @@ VanetCsVfcExperiment::UpdateAllFogCluster()
       Ptr<MobilityModel> obuMobility = obu->GetObject<MobilityModel> ();
       Vector pos_obu = obuMobility->GetPosition ();
 #endif
+
+      // update the status of every vehicle
+      if (CalculateDistance (pos_obu, pos_bs) > BS_Transmission_Range )
+	{
+	  vehsStatus[obuIdx] = false;
+	}
+      else
+	{
+	  vehsStatus[obuIdx] = true;
+	}
+
+      // update vehicle set for every fog
       for (uint32_t j = 0; j < m_nRsuNodes; j++)
 	{
 	  Ptr<Node> rsu = m_rsuNodes.Get(j);
@@ -676,6 +692,10 @@ VanetCsVfcExperiment::UpdateAllFogCluster()
   else if (m_schemeName.compare(Scheme_2) == 0)
     {
       ConstructMostRewardingPktToBroadcast();
+    }
+  else if (m_schemeName.compare(Scheme_3) == 0)
+    {
+      MAandBroadcast ();
     }
 #endif
 }
@@ -1474,6 +1494,81 @@ VanetCsVfcExperiment::ConstructMostRewardingPktToBroadcast ()
   Simulator::ScheduleNow (&UdpSender::Send, sender);
 
 //  requestQueue.pop_front();
+}
+
+void
+VanetCsVfcExperiment::MAandBroadcast ()
+{
+  std::set<uint32_t> vehs;
+  for (uint32_t i = 0; i < m_nObuNodes; i++)
+    {
+      if (vehsStatus[i]) vehs.insert(i);
+    }
+  if( !libMAInitialize())
+  {
+      std::cout << "Could not initialize libmyFunc!" << std::endl;
+      return;
+  }
+
+//  mwSize dims[3] = {vehs.size(), globalDbSize, globalDbSize};
+//  mwArray mwVehsCachesMatrix(3, dims, mxUINT32_CLASS);
+//  mwArray mwTick(1, 1, mxUINT32_CLASS);
+//  uint32_t k = 1;
+//  for (uint32_t veh : vehs)
+//    {
+//      for (uint32_t cache : vehsCaches[veh])
+//	{
+//	  if (!vehsStatus[veh]) continue;
+//	  for (uint32_t i = 0; i < globalDbSize; i++)
+//	    {
+//	      for (uint32_t j = 0; j < globalDbSize; j++)
+//		{
+//		  if (cache == j) mwVehsCachesMatrix(k++, i + 1, j + 1) = 1;
+//		}
+//	    }
+//	}
+//    }
+
+  mwSize dims[3] = {globalDbSize, globalDbSize, vehs.size()};
+  mwArray mwVehsCachesMatrix(3, dims, mxUINT32_CLASS);
+  mwArray mwTick(1, 1, mxUINT32_CLASS);
+  uint32_t k = 1;
+  for (uint32_t veh : vehs)
+    {
+      for (uint32_t cache : vehsCaches[veh])
+	{
+	  if (!vehsStatus[veh]) continue;
+	  for (uint32_t i = 0; i < globalDbSize; i++)
+	    {
+	      for (uint32_t j = 0; j < globalDbSize; j++)
+		{
+		  if (cache == j) mwVehsCachesMatrix(i + 1, j + 1, k++) = 1;
+		}
+	    }
+	}
+    }
+
+  mwArray mwResult1(mxUINT32_CLASS);
+  mwArray mwResult2(1, 1, mxUINT32_CLASS);
+  MA(2, mwResult1, mwResult2, mwVehsCachesMatrix, mwTick);
+
+  uint32_t time = mwResult2.Get(1, 1);
+  for (uint32_t i = 1; i <= time; i++)
+    {
+      std::cout << "i:";
+      for (uint32_t j = 1; j <= globalDbSize; j++)
+	{
+	  if ((uint32_t)mwResult1(i, j) == 1)
+	    {
+	      std::cout << " " << mwResult1(i, j);
+	    }
+	}
+      std::cout << std::endl;
+    }
+
+  libMATerminate();
+
+  mclTerminateApplication();
 }
 
 void
@@ -2939,6 +3034,7 @@ VanetCsVfcExperiment::Initialization ()
 
   globalDB.resize(globalDbSize);
   vehsEnterFlag.resize(m_nObuNodes, false);
+  vehsStatus.resize(m_nObuNodes, false);
 
   vehsInitialReqs.resize(m_nObuNodes);
   vehsInitialCaches.resize(m_nObuNodes);
