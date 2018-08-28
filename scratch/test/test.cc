@@ -20,6 +20,11 @@
 #include "byte-buffer.h"
 #include "stats.h"
 #include "custom-type.h"
+#include "libadd.h"
+#include "libMA.h"
+#include <mclmcrrt.h>
+#include <mclcppclass.h>
+#include <matrix.h>
 
 using namespace ns3;
 
@@ -52,7 +57,7 @@ main (int argc, char *argv[])
       }
 
     GraphMatrix<VertexNode> graphM(vertices, vertices.size());
-    EdgeNode<> en = {1, 1};
+    EdgeNode<> en = {.type = EdgeType::NOT_SET, .weight = 1};
 #if 0
     graphM.addEdge(vertices[0], vertices[2], en);
     graphM.addEdge(vertices[3], vertices[1], en);
@@ -63,13 +68,13 @@ main (int argc, char *argv[])
 #endif
 
 #if 1
+    graphM.addEdge(vertices[0], vertices[1], en);
     graphM.addEdge(vertices[0], vertices[2], en);
     graphM.addEdge(vertices[0], vertices[3], en);
     graphM.addEdge(vertices[0], vertices[4], en);
     graphM.addEdge(vertices[2], vertices[3], en);
     graphM.addEdge(vertices[2], vertices[4], en);
     graphM.addEdge(vertices[3], vertices[4], en);
-    graphM.addEdge(vertices[0], vertices[1], en);
 #endif
     graphM.printEdge();
 
@@ -80,14 +85,14 @@ main (int argc, char *argv[])
       }
     cout << "------------" << endl;
 
-//    {
-//      clock_t startTime, endTime;
-//      startTime = clock();
-//      graphM.printCliques(graphM.getCliques(10));
-//      endTime = clock();
-//      cout << "sim time: " << Now().GetSeconds() << ", clock: " << (double)(endTime - startTime) / CLOCKS_PER_SEC << endl;
-//      cout << "------------" << endl;
-//    }
+    {
+      clock_t startTime, endTime;
+      startTime = clock();
+      graphM.printCliques(graphM.getCliques(10));
+      endTime = clock();
+      cout << "sim time: " << Now().GetSeconds() << ", clock: " << (double)(endTime - startTime) / CLOCKS_PER_SEC << endl;
+      cout << "------------" << endl;
+    }
 
     {
       clock_t startTime, endTime;
@@ -130,41 +135,40 @@ main (int argc, char *argv[])
 //    }
 //  cout << endl;
 
-  std::list<ReqQueueItem> requestQueue;
-  for (uint32_t i = 0; i < 10; i++)
-    {
-      ReqQueueItem item(i, i);
-      requestQueue.push_back(item);
-    }
-  std::list<ReqQueueItem>::iterator iter = requestQueue.begin();
-  for (; iter != requestQueue.end(); iter++)
-    {
-      cout << " " << *iter;
-    }
-  cout << endl;
 
-  ReqQueueItem item(2, 2);
-  requestQueue.erase(std::find(requestQueue.begin(), requestQueue.end(), item));
-  ReqQueueItem item2(3, 3);
-  requestQueue.erase(std::find(requestQueue.begin(), requestQueue.end(), item2));
+  if( !libaddInitialize())
+  {
+      std::cout << "Could not initialize libmyFunc!" << std::endl;
+      return -1;
+  }
 
-  iter = requestQueue.begin();
-  for (; iter != requestQueue.end(); iter++)
-    {
-      cout << " " << *iter;
-    }
-  cout << endl;
+  double a = 1;
+  double b = 4;
+  double c;
 
-  std::ofstream ofs;
-  std::string m_workspacePath = "/home/haha/ns3.29-dev-workspace/workspace/vanet-cs-vfc";
-  std::ostringstream oss;
-  oss << m_workspacePath << "/result/test.txt";
-  ofs.open (oss.str(), ios::app);
-  ofs << "haha" << endl;
-  ofs.close();
-  ofs.open (oss.str(), ios::app);
-  ofs << "hehe" << endl;
-  ofs.close();
+  mwArray mwA(1, 1, mxDOUBLE_CLASS);
+  mwArray mwB(1, 1, mxDOUBLE_CLASS);
+  mwArray mwC(1, 1, mxDOUBLE_CLASS);
 
+  mwA.SetData(&a, 1);
+  mwB.SetData(&b, 1);
 
+  add(1, mwC, mwA, mwB);
+
+  c = mwC.Get(1, 1);
+
+  cout<<"The sum is: "<<c<<endl;
+  libaddTerminate();
+
+  if( !libMAInitialize())
+  {
+      std::cout << "Could not initialize libmyFunc!" << std::endl;
+      return -1;
+  }
+
+//  MA();
+
+  libMATerminate();
+
+  mclTerminateApplication();
 }

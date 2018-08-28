@@ -41,20 +41,20 @@ NS_LOG_COMPONENT_DEFINE ("vanet-cs-vfc");
 #define Output_Animation 					false
 #define Gen_Gnuplot_File					false
 
-#define Lte_Enable 						false	// turn on/off LTE
-#define Upload_Enable 						false
+#define Lte_Enable 						true	// turn on/off LTE
+#define Upload_Enable 						true
 #define Cloud_Enable 						true
 #define Print_Log_Header_On_Receive 				true
 #define Print_Msg_Type 						true
 #define Print_Edge_Type 					true
 #define Print_Received_Data_Cloud 				false
-#define Print_Received_Log 					false
+#define Print_Received_Log 					true
 #define Print_Vehicle_Initial_Request 				false
 #define Print_Vehicle_Initial_Cache 				false
 #define Print_Vehicle_Request 					false
 #define Print_Vehicle_Cache 					false
-#define Print_Vehicle_Final_Request 				true
-#define Print_Vehicle_Final_Cache 				true
+#define Print_Vehicle_Final_Request 				false
+#define Print_Vehicle_Final_Cache 				false
 #define Print_Fog_Cluster 					false
 #define Scheduling 						true
 #define Print_Edge 						false
@@ -64,10 +64,35 @@ NS_LOG_COMPONENT_DEFINE ("vanet-cs-vfc");
 #define Construct_Graph_And_Find_Clique_Time_stas 		false
 
 #define Device_Transmission_Range 				450
-#define Gloabal_DB_Size 					200
-#define Num_Cliques 						1
+#define Num_Cliques 						3
 #define Packet_Size 						1024
 #define Total_Sim_Time 						581.01
+
+#define Output_Result						false
+#define Console_Output_Result					false
+#define Loop_Scheduling						false
+
+#define Scheme_1						"cs-vfc"
+#define Scheme_2						"ncb"
+#define Scheme_3						"genetic"
+
+#define Test_Bid						54
+
+#if Console_Output_Result
+
+#undef Print_Received_Log
+#define Print_Received_Log 					false
+
+#undef Print_Log_Header_On_Receive
+#define Print_Log_Header_On_Receive 				false
+
+#undef Print_Msg_Type
+#define Print_Msg_Type 						false
+
+#undef Print_Edge_Type
+#define Print_Edge_Type 					false
+
+#endif //Console_Output
 
 /**
  * This simulation is to show the routing service of WaveNetDevice described in IEEE 09.4.
@@ -177,6 +202,12 @@ protected:
   virtual void RunSimulation ();
 
   /**
+   * \brief Check the simulation stauts
+   * \return none
+   */
+  virtual void CheckSimulationStatus ();
+
+  /**
    * \brief Process outputs
    * \return none
    */
@@ -266,6 +297,8 @@ private:
   void ReceivePacketWithAddr (std::string context, Ptr<const Packet> packet, const Address & srcAddr, const Address & destAddr);
 
   void ReceivePacketOnSchemeCsVfc (uint32_t nodeId, Ptr<const Packet> packet, const Address & srcAddr, const Address & destAddr);
+
+  void PrintEdgeType (const EdgeType& edgeType, std::ostringstream& oss);
 
   void ReceivePacketOnSchemeNcb (uint32_t nodeId, Ptr<const Packet> packet, const Address & srcAddr, const Address & destAddr);
 
@@ -366,11 +399,11 @@ private:
   uint32_t m_wavePacketSize; ///< bytes
   uint32_t m_nonSafetySize; ///< bytes
   double m_waveInterval; ///< seconds
-  std::ofstream m_ofs; ///< output stream
   int m_verbose = false;
   int m_routingTables; ///< dump routing table (at t=5 sec).  0=No, 1=Yes
   int m_asciiTrace; ///< ascii trace
   int m_pcap; ///< PCAP
+  double m_timeSpent;
 
   RequestStats m_requestStats; ///< request statistics
   Ptr<WifiPhyStats> m_wifiPhyStats; ///< wifi phy statistics
@@ -380,6 +413,7 @@ private:
   std::vector<uint32_t> globalDB;
   std::map<uint32_t, uint32_t> vehId2IndexMap;
   std::vector<bool> vehsEnterFlag;
+  std::vector<bool> vehsStatus; ///< vehicle is in the service area or not
   std::vector<std::set<uint32_t>> vehsReqs;
   std::vector<std::set<uint32_t>> vehsCaches;
   std::vector<std::set<uint32_t>> vehsInitialReqs;

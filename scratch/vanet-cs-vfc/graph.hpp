@@ -375,20 +375,21 @@ vector<vector<V>> GraphMatrix<V>::getCliques(uint32_t nClique)
 template<typename V>
 vector<vector<V>> GraphMatrix<V>::getCliquesWithBA(uint32_t nClique)
 {
+  GraphMatrix<V> graphCopy = *this;
   vector<vector<V>> cliques;
 
-  for (uint32_t i = 0; i < nClique && !isEmpty(); i++)
+  for (uint32_t i = 0; i < nClique && !graphCopy.isEmpty(); i++)
     {
       vector<V> clique;
 
-      size_t size = getSize();
+      size_t size = graphCopy.getSize();
       MCP mcp;
       mcp.bestx.resize(size);
       mcp.x.resize(size);
       mcp.bestn=0;
       mcp.cnum=0;
 
-      backtrace(mcp, 0);
+      graphCopy.backtrace(mcp, 0);
       for (size_t j = 0; j < size; j++)
 	{
 	  if (mcp.bestx[j] == 1)
@@ -401,7 +402,7 @@ vector<vector<V>> GraphMatrix<V>::getCliquesWithBA(uint32_t nClique)
 
       for (V v : clique)
 	{
-	  delVertex(v);
+	  graphCopy.delVertex(v);
 	}
     }
 

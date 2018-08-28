@@ -768,6 +768,11 @@ def add_scratch_programs(bld):
                 obj.target = filename
                 obj.name = obj.target
                 obj.install_path = None
+                
+                # added by yangyanning
+                obj.env.append_value("INCLUDES", "/home/haha/ns3.29-dev-workspace/ns-3-allinone/ns-3-dev/libdir/include")
+                obj.env.append_value("LIBPATH", ["/home/haha/ns3.29-dev-workspace/ns-3-allinone/ns-3-dev/libdir/lib"])
+                obj.env.append_value("LIB", ["add", "MA", "mwmclmcrrt"])
             elif filename.endswith(".cc"):
                 name = filename[:-len(".cc")]
                 obj = bld.create_ns3_program(name, all_modules)
@@ -776,6 +781,11 @@ def add_scratch_programs(bld):
                 obj.target = name
                 obj.name = obj.target
                 obj.install_path = None
+                
+                # added by yangyanning
+                obj.env.append_value("INCLUDES", "/home/haha/ns3.29-dev-workspace/ns-3-allinone/ns-3-dev/libdir/include")
+                obj.env.append_value("LIBPATH", ["/home/haha/ns3.29-dev-workspace/ns-3-allinone/ns-3-dev/libdir/lib"])
+                obj.env.append_value("LIB", ["add", "MA", "mwmclmcrrt"])
     except OSError:
         return
 

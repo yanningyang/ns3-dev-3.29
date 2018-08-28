@@ -73,6 +73,7 @@ UdpSender::UdpSender ()
   m_peerPort = 0;
   m_size = 0;
   m_dataSize = 0;
+  m_pktTag = NULL;
 }
 
 UdpSender::UdpSender (Ptr<Node> sender, Address ip, uint16_t port)
@@ -86,6 +87,7 @@ UdpSender::UdpSender (Ptr<Node> sender, Address ip, uint16_t port)
   m_data = 0;
   m_size = 0;
   m_dataSize = 0;
+  m_pktTag = NULL;
 }
 
 UdpSender::~UdpSender()
@@ -406,8 +408,11 @@ UdpSender::Send (void)
       NS_ASSERT_MSG (m_data, "UdpSender::Send(): m_dataSize but no m_data");
       p = Create<Packet> (m_data, m_dataSize);
       p->AddHeader(m_header);
-      p->AddPacketTag(*m_pktTag);
-      delete m_pktTag;
+      if (m_pktTag)
+	{
+	  p->AddPacketTag(*m_pktTag);
+	  delete m_pktTag;
+	}
     }
   else
     {
@@ -420,8 +425,11 @@ UdpSender::Send (void)
       //
       p = Create<Packet> (m_size);
       p->AddHeader(m_header);
-      p->AddPacketTag(*m_pktTag);
-      delete m_pktTag;
+      if (m_pktTag)
+	{
+	  p->AddPacketTag(*m_pktTag);
+	  delete m_pktTag;
+	}
     }
 
   Address localAddress;

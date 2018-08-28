@@ -2,7 +2,7 @@
  * graph.hpp
  *
  *  Created on: Jul 24, 2018
- *      Author: haha
+ *      Author: Yang yanning <yang.ksn@gmail.com>
  */
 
 #ifndef SCRATCH_VANET_CS_VFC_GRAPH_HPP_
@@ -16,6 +16,8 @@
 #include <sstream>
 #include <iomanip>
 #include <algorithm>
+
+#include "custom-type.h"
 
 using namespace std;
 
@@ -43,7 +45,7 @@ struct VertexNode
     this->reqDataIndex = 0;
     this->name = "";
   }
-  VertexNode(uint32_t _fogIndex, const uint32_t& _reqDataIndex)
+  VertexNode(const uint32_t& _fogIndex, const uint32_t& _reqDataIndex)
       : fogIndex(_fogIndex)
       , reqDataIndex(_reqDataIndex)
       , name("")
@@ -72,14 +74,14 @@ struct VertexNode
 template <typename W = uint32_t>
 struct EdgeNode
 {
-  uint32_t	type;
+  EdgeType	type;
   W		weight;
   EdgeNode()
   {
-    this->type = 0;
+    this->type = EdgeType::NOT_SET;
     this->weight = 0;
   }
-  EdgeNode(uint32_t _type, const W& _weight)
+  EdgeNode(EdgeType _type, const W& _weight)
       : type(_type)
       , weight(_weight)
   {}
@@ -106,6 +108,7 @@ template <typename V>
 class GraphMatrix
 {
 public:
+  GraphMatrix();
   GraphMatrix(const vector<V>& _vertex, size_t _size, bool _isDirected = false);
   void printEdge();
   vector<V> getAdjVertex(const V& v);
@@ -113,6 +116,8 @@ public:
   void delVertex(const size_t& index);
   void addEdge(const V& v1, const V& v2, const EdgeNode<>& en);
   void addEdge(const size_t& v1, const size_t& v2, const EdgeNode<>& en);
+  EdgeType getEdgeType(const V& v1, const V& v2);
+  EdgeType getEdgeType(const size_t& v1, const size_t& v2);
   size_t getDegree(const V& v);
   vector<PAIR<V>> sortAllVertexByDegree();
   GraphMatrix<V> getComplement();
@@ -135,6 +140,12 @@ private:
   std::map<std::string, uint32_t>	vertex2IdxMap;
   std::vector<std::vector<EdgeNode<>>>	edge;
 };
+
+template<typename V>
+GraphMatrix<V>::GraphMatrix()
+{
+
+}
 
 template<typename V>
 GraphMatrix<V>::GraphMatrix(const vector<V>& _vertex, size_t _size, bool _isDirected)
@@ -213,9 +224,9 @@ void GraphMatrix<V>::delVertex(const size_t& index)
 template<typename V>
 void GraphMatrix<V>::addEdge(const V& v1, const V& v2, const EdgeNode<>& en)
 {
-    size_t start = getIndexOfVertex(v1);
-    size_t end = getIndexOfVertex(v2);
-    addEdge(start, end, en);
+  size_t start = getIndexOfVertex(v1);
+  size_t end = getIndexOfVertex(v2);
+  addEdge(start, end, en);
 }
 
 template<typename V>
@@ -226,6 +237,21 @@ void GraphMatrix<V>::addEdge(const size_t& v1, const size_t& v2, const EdgeNode<
   edge[v1][v2] = en;
   if (!isDirected)
       edge[v2][v1] = en;
+}
+
+template<typename V>
+EdgeType GraphMatrix<V>::getEdgeType(const V& v1, const V& v2)
+{
+  size_t start = getIndexOfVertex(v1);
+  size_t end = getIndexOfVertex(v2);
+  return getEdgeType(start, end);
+}
+
+template<typename V>
+EdgeType GraphMatrix<V>::getEdgeType(const size_t& v1, const size_t& v2)
+{
+  assert(v1 != v2);
+  return edge[v1][v2].type;
 }
 
 template<typename V>
@@ -302,7 +328,7 @@ GraphMatrix<V> GraphMatrix<V>::getComplement()
 	{
 	  if (edge[i][j].weight == 0 && i != j)
 	    {
-	      EdgeNode<> en = {0, 1};
+	      EdgeNode<> en = {.type = EdgeType::NOT_SET, .weight = 1};
 	      complement.addEdge(i, j, en);
 	    }
 	}
@@ -313,12 +339,13 @@ GraphMatrix<V> GraphMatrix<V>::getComplement()
 template<typename V>
 vector<vector<V>> GraphMatrix<V>::getCliques(uint32_t nClique)
 {
+  GraphMatrix<V> graphCopy = *this;
   vector<vector<V>> cliques;
 
-  for (uint32_t i = 0; i < nClique && !isEmpty(); i++)
+  for (uint32_t i = 0; i < nClique && !graphCopy.isEmpty(); i++)
     {
       vector<V> clique;
-      GraphMatrix<V> complement = getComplement();
+      GraphMatrix<V> complement = graphCopy.getComplement();
       vector<PAIR<V>> sortedVertex = complement.sortAllVertexByDegree();
 
       size_t size1 = sortedVertex.size();
@@ -338,7 +365,7 @@ vector<vector<V>> GraphMatrix<V>::getCliques(uint32_t nClique)
 
       for (V v : clique)
 	{
-	  delVertex(v);
+	  graphCopy.delVertex(v);
 	}
     }
 
@@ -348,25 +375,26 @@ vector<vector<V>> GraphMatrix<V>::getCliques(uint32_t nClique)
 template<typename V>
 vector<vector<V>> GraphMatrix<V>::getCliquesWithBA(uint32_t nClique)
 {
+  GraphMatrix<V> graphCopy = *this;
   vector<vector<V>> cliques;
 
-  for (uint32_t i = 0; i < nClique && !isEmpty(); i++)
+  for (uint32_t i = 0; i < nClique && !graphCopy.isEmpty(); i++)
     {
       vector<V> clique;
 
-      size_t size = getSize();
+      size_t size = graphCopy.getSize();
       MCP mcp;
       mcp.bestx.resize(size);
       mcp.x.resize(size);
       mcp.bestn=0;
       mcp.cnum=0;
 
-      backtrace(mcp, 0);
+      graphCopy.backtrace(mcp, 0);
       for (size_t j = 0; j < size; j++)
 	{
 	  if (mcp.bestx[j] == 1)
 	    {
-	      clique.push_back(vertices[j]);
+	      clique.push_back(graphCopy.vertices[j]);
 	    }
 	}
 
@@ -374,7 +402,7 @@ vector<vector<V>> GraphMatrix<V>::getCliquesWithBA(uint32_t nClique)
 
       for (V v : clique)
 	{
-	  delVertex(v);
+	  graphCopy.delVertex(v);
 	}
     }
 
@@ -419,6 +447,7 @@ void GraphMatrix<V>::backtrace(MCP &mcp, size_t i)
 template<typename V>
 void GraphMatrix<V>::printClique(const vector<V>& clique)
 {
+  std::cout << "clique:";
   for (V v : clique)
     {
       std::cout << v << " ";

@@ -152,7 +152,7 @@ BroadCastData (Ptr<Node> remoteHost)
 //  Simulator::Schedule(Seconds(Simulator::Now().GetSeconds() + 0.01), &UdpSender::Send, sender);
 
   TypeId tid = TypeId::LookupByName ("ns3::UdpSocketFactory");
-  for (uint32_t i = 0; i < 1; ++i)
+  for (uint32_t i = 0; i < 10; ++i)
     {
       Ptr<Socket> source = Socket::CreateSocket (remoteHost, tid);
       source->SetAllowBroadcast (true);
@@ -220,7 +220,7 @@ int main (int argc, char *argv[])
   // The below set of helpers will help us to put together the wifi NICs we want
   YansWifiChannelHelper wifiChannel = YansWifiChannelHelper::Default ();
   wifiChannel.SetPropagationDelay ("ns3::ConstantSpeedPropagationDelayModel");
-  wifiChannel.AddPropagationLoss ("ns3::FriisPropagationLossModel", "Frequency", DoubleValue (5.9e9)); // txp 137 450m
+  wifiChannel.AddPropagationLoss ("ns3::FriisPropagationLossModel", "Frequency", DoubleValue (5e9)); // txp 137 450m
 //  wifiChannel.AddPropagationLoss ("ns3::TwoRayGroundPropagationLossModel", "Frequency", DoubleValue (5.9e9), "HeightAboveZ", DoubleValue (1.5));
 
   YansWifiPhyHelper wifiPhy =  YansWifiPhyHelper::Default ();
@@ -307,20 +307,18 @@ int main (int argc, char *argv[])
 #else
   MobilityHelper mobility;
   Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator> ();
-  positionAlloc->Add (Vector (1600.0, 1600.0, 0.0));
+  positionAlloc->Add (Vector (1500.0, 1500.0, 0.0));
   mobility.SetPositionAllocator (positionAlloc);
   mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
   mobility.Install (rsuNodes);
 
   positionAlloc = CreateObject<ListPositionAllocator> ();
-  positionAlloc->Add (Vector (1600.0, 1600.0 - distance, 0.0));
-//  positionAlloc->Add (Vector (3000.0, 0.0, 0.0));
-//  positionAlloc->Add (Vector (0.0, 3000.0, 0.0));
+//  positionAlloc->Add (Vector (1600.0, 1600.0 - distance, 0.0));
 
-//  for (uint32_t i = 0; i < obuNodes.GetN (); ++i)
-//    {
-//      positionAlloc->Add (Vector (0.0 + i * 20, 0.0, 0.0));
-//    }
+  for (uint32_t i = 0; i < obuNodes.GetN (); ++i)
+    {
+      positionAlloc->Add (Vector (0.0 + i * 0, 100.0, 0.0));
+    }
 
   mobility.SetPositionAllocator (positionAlloc);
   mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
@@ -374,7 +372,7 @@ int main (int argc, char *argv[])
   Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::PacketSink/RxWithAddresses", MakeCallback (&TwoAddressTrace));
   serverApps.Start (Seconds (0.01));
 
-#if 0
+#if 1
   for (uint32_t i = 0; i < obuNodes.GetN (); ++i)
     {
 //      Ptr<UdpSender> sender = CreateObject<UdpSender>();
@@ -387,7 +385,7 @@ int main (int argc, char *argv[])
       source->SetAllowBroadcast (true);
       InetSocketAddress remote = InetSocketAddress (interface_80211_rsu.GetAddress(0), 80);
       source->Connect (remote);
-      Simulator::Schedule(Seconds(1 + i * 0.00), &SendData, source);
+      Simulator::Schedule(Seconds(1 + i * 0.01), &SendData, source);
     }
 #endif
 
@@ -407,7 +405,7 @@ int main (int argc, char *argv[])
     }
 #endif
 
-  Simulator::Schedule(Seconds(0.01), &BroadCastData, rsuNodes.Get (0));
+//  Simulator::Schedule(Seconds(0.01), &BroadCastData, rsuNodes.Get (0));
 
 
   // -----------------------------------------XOR-----------------------------------------------------
