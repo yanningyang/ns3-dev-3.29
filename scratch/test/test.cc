@@ -20,8 +20,8 @@
 #include "byte-buffer.h"
 #include "stats.h"
 #include "custom-type.h"
-#include "libadd.h"
 #include "libMA.h"
+#include "libadd.h"
 #include <mclmcrrt.h>
 #include <mclcppclass.h>
 #include <matrix.h>
@@ -29,11 +29,6 @@
 using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("ScratchSimulator");
-
-void test()
-{
-  cout << Now().GetDouble() << endl;
-}
 
 int 
 main (int argc, char *argv[])
@@ -105,95 +100,94 @@ main (int argc, char *argv[])
   }
 #endif
 
-//  std::set<uint32_t> haha;
-//  std::set<uint32_t> hehe;
-//  for (uint32_t i = 0; i < 10; i++)
-//    {
-//      haha.insert(i);
-//    }
-//  hehe.insert(2);
-//  hehe.insert(4);
-//  hehe.insert(6);
-//
-//  std::set<uint32_t>::iterator iter = haha.begin();
-//  for (; iter != haha.end(); iter++)
-//    {
-//      cout << " " << *iter;
-//    }
-//  cout << endl;
-//
-//  std::set<uint32_t>::iterator iter2 = hehe.begin();
-//  for (; iter2 != hehe.end(); iter2++)
-//    {
-//      haha.erase(*iter2);
-//    }
-//
-//  iter = haha.begin();
-//  for (; iter != haha.end(); iter++)
-//    {
-//      cout << " " << *iter;
-//    }
-//  cout << endl;
-
+  mwArray *haha;
 
   if( !libaddInitialize())
   {
-      std::cout << "Could not initialize libmyFunc!" << std::endl;
-      return -1;
+    std::cout << "Could not initialize libadd!" << std::endl;
+    return -1;
   }
 
-  double a = 1;
-  double b = 4;
+//  double a = 1;
+//  double b = 4;
   double c;
 
   mwArray mwA(1, 1, mxDOUBLE_CLASS);
   mwArray mwB(1, 1, mxDOUBLE_CLASS);
-  mwArray mwC(1, 1, mxDOUBLE_CLASS);
+  mwArray mwC(mxDOUBLE_CLASS);
+  mwArray mwD(2, 2, mxDOUBLE_CLASS);
 
-  mwA.SetData(&a, 1);
-  mwB.SetData(&b, 1);
+  mwA(1, 1) = 2;
+  mwB(1, 1) = 4;
+
+  mwD(1, 1) = 1;
+  mwD(1, 2) = 2;
+  mwD(2, 1) = 3;
+  mwD(2, 2) = 4;
 
   add(1, mwC, mwA, mwB);
 
-  c = mwC.Get(1, 1);
+  c = (double)mwC.Get(1, 1);
 
   cout<<"The sum is: "<<c<<endl;
+
+  cout<<"mwD(1, 1): "<< mwD(1, 1) <<endl;
+  cout<<"mwD(1, 2): "<< mwD(1, 2) <<endl;
+  cout<<"mwD(2, 1): "<< mwD(2, 1) <<endl;
+  cout<<"mwD(2, 2): "<< mwD(2, 2) <<endl;
+
   libaddTerminate();
 
   if( !libMAInitialize())
   {
-      std::cout << "Could not initialize libmyFunc!" << std::endl;
+      std::cout << "Could not initialize libMA!" << std::endl;
       return -1;
   }
 
-  mwSize dims[3] = {3, 2, 2};
+  uint32_t dim1 = 3;
+  uint32_t dim2 = 2;
+  uint32_t dim3 = 2;
+  mwSize dims[3] = {dim1, dim2, dim3};
   mwArray mwT(3, dims, mxDOUBLE_CLASS);
   double data[12] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
   mwT.SetData(data, 12);
 
   std::cout << "dims="<<mwT.GetDimensions()<<std::endl;
 
-//  std::cout << "mwT(1,1,1)="<<mwT.Get(3, 1, 1, 1)<<std::endl;
-//  std::cout << "mwT(1,1,2)="<<mwT.Get(3, 1, 1, 2)<<std::endl;
-//  std::cout << "mwT(1,2,1)="<<mwT.Get(3, 1, 2, 1)<<std::endl;
-//  std::cout << "mwT(1,2,2)="<<mwT.Get(3, 1, 2, 2)<<std::endl;
+  for (uint32_t i = 1; i <= dim1; i++)
+    {
+      cout << i << ":" << endl;
+      for (uint32_t j = 1; j <= dim2; j++)
+	{
+	  for (uint32_t k = 1; k <= dim3; k++)
+	    {
+	      cout << " " << mwT(i, j, k);
+	    }
+	  cout << endl;
+	}
+    }
+//  mwArray haha;
+  haha = new mwArray(3, 2, mxDOUBLE_CLASS);
+  for (uint32_t i = 1; i <= dim1; i++)
+    {
+      for (uint32_t j = 1; j <= dim2; j++)
+	{
+	  (*haha)(i, j) = mwT(i, j, 1);
+	}
+      cout << endl;
+    }
 
-  std::cout << "mwT(1,1,1)="<<mwT(1, 1, 1)<<std::endl;
-  std::cout << "mwT(1,1,2)="<<mwT(1, 1, 2)<<std::endl;
-  std::cout << "mwT(1,2,1)="<<mwT(1, 2, 1)<<std::endl;
-  std::cout << "mwT(1,2,2)="<<mwT(1, 2, 2)<<std::endl;
+  cout << "haha:" << endl;
+  for (uint32_t i = 1; i <= dim1; i++)
+    {
+      for (uint32_t j = 1; j <= dim2; j++)
+	{
+	  cout << " " << (*haha)(i, j);
+	}
+      cout << endl;
+    }
 
-  std::cout << "mwT(2,1,1)="<<mwT(2, 1, 1)<<std::endl;
-  std::cout << "mwT(2,1,2)="<<mwT(2, 1, 2)<<std::endl;
-  std::cout << "mwT(2,2,1)="<<mwT(2, 2, 1)<<std::endl;
-  std::cout << "mwT(2,2,2)="<<mwT(2, 2, 2)<<std::endl;
-
-  std::cout << "mwT(3,1,1)="<<mwT(3, 1, 1)<<std::endl;
-  std::cout << "mwT(3,1,2)="<<mwT(3, 1, 2)<<std::endl;
-  std::cout << "mwT(3,2,1)="<<mwT(3, 2, 1)<<std::endl;
-  std::cout << "mwT(3,2,2)="<<mwT(3, 2, 2)<<std::endl;
-
-//  MA();
+  delete haha;
 
   libMATerminate();
 

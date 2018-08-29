@@ -53,6 +53,16 @@ VanetCsVfcExperiment::VanetCsVfcExperiment ():
 {
 }
 
+VanetCsVfcExperiment::~VanetCsVfcExperiment ()
+{
+  if (m_schemeName.compare(Scheme_3) == 0)
+    {
+      libMATerminate();
+
+      mclTerminateApplication();
+    }
+}
+
 void
 VanetCsVfcExperiment::Simulate (int argc, char **argv)
 {
@@ -645,13 +655,13 @@ VanetCsVfcExperiment::UpdateAllFogCluster()
 #endif
 
       // update the status of every vehicle
-      if (CalculateDistance (pos_obu, pos_bs) > BS_Transmission_Range )
+      if (CalculateDistance (pos_obu, pos_bs) <= BS_Transmission_Range && vehsEnterFlag[obuIdx] )
 	{
-	  vehsStatus[obuIdx] = false;
+	  vehsStatus[obuIdx] = true;
 	}
       else
 	{
-	  vehsStatus[obuIdx] = true;
+	  vehsStatus[obuIdx] = false;
 	}
 
       // update vehicle set for every fog
@@ -1504,71 +1514,73 @@ VanetCsVfcExperiment::MAandBroadcast ()
     {
       if (vehsStatus[i]) vehs.insert(i);
     }
-  if( !libMAInitialize())
-  {
-      std::cout << "Could not initialize libmyFunc!" << std::endl;
-      return;
-  }
-
-//  mwSize dims[3] = {vehs.size(), globalDbSize, globalDbSize};
-//  mwArray mwVehsCachesMatrix(3, dims, mxUINT32_CLASS);
-//  mwArray mwTick(1, 1, mxUINT32_CLASS);
-//  uint32_t k = 1;
-//  for (uint32_t veh : vehs)
-//    {
-//      for (uint32_t cache : vehsCaches[veh])
-//	{
-//	  if (!vehsStatus[veh]) continue;
-//	  for (uint32_t i = 0; i < globalDbSize; i++)
-//	    {
-//	      for (uint32_t j = 0; j < globalDbSize; j++)
-//		{
-//		  if (cache == j) mwVehsCachesMatrix(k++, i + 1, j + 1) = 1;
-//		}
-//	    }
-//	}
-//    }
+  if (vehs.size() == 0) return;
 
   mwSize dims[3] = {globalDbSize, globalDbSize, vehs.size()};
-  mwArray mwVehsCachesMatrix(3, dims, mxUINT32_CLASS);
+  mwArray mwVehsCachesMatrixTmp(3, dims, mxDOUBLE_CLASS);
   mwArray mwTick(1, 1, mxUINT32_CLASS);
   uint32_t k = 1;
   for (uint32_t veh : vehs)
     {
-      for (uint32_t cache : vehsCaches[veh])
+      for (uint32_t i = 1; i <= globalDbSize; i++)
 	{
-	  if (!vehsStatus[veh]) continue;
-	  for (uint32_t i = 0; i < globalDbSize; i++)
+	  for (uint32_t j = 1; j <= globalDbSize; j++)
 	    {
-	      for (uint32_t j = 0; j < globalDbSize; j++)
-		{
-		  if (cache == j) mwVehsCachesMatrix(i + 1, j + 1, k++) = 1;
-		}
+	      mwVehsCachesMatrixTmp(i, j, k) = (*mwVehsCachesMatrix)(i, j, veh);
 	    }
 	}
+      k += 1;
     }
+
+  mwTick(1, 1) = 3;
 
   mwArray mwResult1(mxUINT32_CLASS);
   mwArray mwResult2(1, 1, mxUINT32_CLASS);
-  MA(2, mwResult1, mwResult2, mwVehsCachesMatrix, mwTick);
+  MA(2, mwResult1, mwResult2, mwVehsCachesMatrixTmp, mwTick);
 
+  cout << "----------------------------" << endl;
   uint32_t time = mwResult2.Get(1, 1);
   for (uint32_t i = 1; i <= time; i++)
     {
-      std::cout << "i:";
+      std::cout << i << ":";
+
+      currentBroadcastId++;
       for (uint32_t j = 1; j <= globalDbSize; j++)
 	{
+	  std::cout << " " << mwResult1(i, j);
+
 	  if ((uint32_t)mwResult1(i, j) == 1)
 	    {
-	      std::cout << " " << mwResult1(i, j);
+	      dataToBroadcast[currentBroadcastId].push_back(j - 1);
 	    }
 	}
       std::cout << std::endl;
+
+//      m_requestStats.IncBroadcastPkts();
+//
+//      Ptr<UdpSender> sender = CreateObject<UdpSender>();
+//      sender->SetNode(m_remoteHost);
+//      sender->SetRemote(Ipv4Address ("10.2.255.255"), m_dlPort);
+//      sender->SetDataSize(Packet_Size);
+//      sender->Start();
+//      using vanet::PacketHeader;
+//      PacketHeader header;
+//      header.SetType(PacketHeader::MessageType::DATA_C2V);
+//      header.SetBroadcastId(currentBroadcastId);
+//      sender->SetHeader(header);
+//
+//      using vanet::PacketTagC2v;
+//      PacketTagC2v *pktTag = new PacketTagC2v();
+//      std::vector<uint32_t> reqsIds;
+//      for (uint32_t data : dataToBroadcast[currentBroadcastId])
+//	{
+//	  reqsIds.push_back(data);
+//	}
+//      pktTag->SetReqsIds(reqsIds);
+//      sender->SetPacketTag(pktTag);
+//
+//      Simulator::ScheduleNow (&UdpSender::Send, sender);
     }
-
-  libMATerminate();
-
-  mclTerminateApplication();
 }
 
 void
@@ -2028,6 +2040,10 @@ VanetCsVfcExperiment::ReceivePacketWithAddr (std::string context, Ptr<const Pack
   else if (m_schemeName.compare(Scheme_2) == 0)
     {
       ReceivePacketOnSchemeNcb (nodeId, packet, srcAddr, destAddr);
+    }
+  else if (m_schemeName.compare(Scheme_3) == 0)
+    {
+      ReceivePacketOnSchemeMA (nodeId, packet, srcAddr, destAddr);
     }
 }
 
@@ -3021,6 +3037,84 @@ VanetCsVfcExperiment::ReceivePacketOnSchemeNcb (uint32_t nodeId, Ptr<const Packe
 }
 
 void
+VanetCsVfcExperiment::ReceivePacketOnSchemeMA (uint32_t nodeId, Ptr<const Packet> packet, const Address & srcAddr, const Address & destAddr)
+{
+  std::ostringstream oss;
+  oss << "sim time:" <<Simulator::Now ().GetSeconds () << ", clock: " << (double)(clock()) / CLOCKS_PER_SEC;
+#if Print_Log_Header_On_Receive
+  if (InetSocketAddress::IsMatchingType (srcAddr))
+    {
+      InetSocketAddress inetSrcAddr = InetSocketAddress::ConvertFrom (srcAddr);
+      oss << " src: " << inetSrcAddr.GetIpv4 ();
+    }
+  if (InetSocketAddress::IsMatchingType (destAddr))
+    {
+      InetSocketAddress inetDestAddr = InetSocketAddress::ConvertFrom (destAddr);
+      oss << " dest: " << inetDestAddr.GetIpv4 ();
+    }
+#endif
+
+  using vanet::PacketHeader;
+  PacketHeader recvHeader;
+  Ptr<Packet> pktCopy = packet->Copy();
+  pktCopy->RemoveHeader(recvHeader);
+
+  uint32_t broadcastId = recvHeader.GetBroadcastId();
+
+  oss << " bId: " << broadcastId;
+
+#if Print_Msg_Type
+  switch (recvHeader.GetType())
+  {
+    case PacketHeader::MessageType::DATA_C2V:
+      oss << " MessageType::DATA_C2V ";
+      break;
+    case PacketHeader::MessageType::DATA_V2F:
+      oss << " MessageType::DATA_V2F ";
+      break;
+    case PacketHeader::MessageType::DATA_F2V:
+      oss << " MessageType::DATA_F2V ";
+      break;
+    default:
+      NS_ASSERT_MSG(false, "MessageType must be DATA_C2V, DATA_V2F or DATA_F2V");
+  }
+#endif
+
+  if (recvHeader.GetType() == PacketHeader::MessageType::DATA_C2V)
+    {
+      uint32_t obuIdx = vehId2IndexMap.at(nodeId);
+
+      using vanet::PacketTagC2v;
+      PacketTagC2v pktTagC2v;
+      pktCopy->RemovePacketTag(pktTagC2v);
+      std::vector<uint32_t> datasIdxBroadcast = pktTagC2v.GetReqsIds();
+      uint32_t broadcastDataNum = datasIdxBroadcast.size();
+
+      if (broadcastDataNum == 0) return;
+
+      mwArray vehCacheMatrix(globalDbSize, globalDbSize, mxDOUBLE_CLASS);
+      for (uint32_t i = 1; i <= globalDbSize; i++)
+	{
+	  for (uint32_t j = 1; j <= globalDbSize; j++)
+	    {
+	      vehCacheMatrix(i, j) = (*mwVehsCachesMatrix)(i, j, obuIdx);
+	    }
+	}
+
+      mwArray mwDatasIdxBroadcast(1, globalDbSize, mxDOUBLE_CLASS);
+      for (uint32_t dataIdx : datasIdxBroadcast)
+	{
+	  mwDatasIdxBroadcast(1, dataIdx + 1) = 1.0;
+	}
+    }
+
+  oss << " DbSize:" << globalDbSize;
+#if Print_Received_Log
+  NS_LOG_UNCOND(oss.str());
+#endif
+}
+
+void
 VanetCsVfcExperiment::OnOffTrace (std::string context, Ptr<const Packet> packet)
 {
   uint32_t pktBytes = packet->GetSize ();
@@ -3127,6 +3221,30 @@ VanetCsVfcExperiment::Initialization ()
       cout << endl;
     }
 #endif
+
+  // initialize libMAInitialize
+  if (m_schemeName.compare(Scheme_3) == 0)
+    {
+      if(!libMAInitialize())
+      {
+	  std::cout << "Could not initialize libMA!" << std::endl;
+	  return;
+      }
+
+      mwSize dims[3] = {globalDbSize, globalDbSize, m_nObuNodes};
+      mwVehsCachesMatrix = new mwArray(3, dims, mxDOUBLE_CLASS);
+      mwArray mwTick(1, 1, mxUINT32_CLASS);
+      for (uint32_t obuIdx = 0; obuIdx < m_nObuNodes; obuIdx++)
+        {
+          for (uint32_t i = 0; i < globalDbSize; i++)
+	    {
+	      if (vehsInitialCaches[obuIdx].count(i))
+		{
+		  (*mwVehsCachesMatrix)(i + 1, i + 1, obuIdx) = 1.0;
+		}
+	    }
+        }
+    }
 }
 
 int

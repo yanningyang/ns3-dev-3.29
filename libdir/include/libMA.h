@@ -1,6 +1,6 @@
 //
 // MATLAB Compiler: 6.6 (R2018a)
-// Date: Tue Aug 28 14:44:24 2018
+// Date: Wed Aug 29 10:15:26 2018
 // Arguments: "-B""macro_default""-W""cpplib:libMA""-T""link:lib""MA.m"
 //
 
@@ -80,7 +80,7 @@ bool MW_CALL_CONV mlxMA(int nlhs, mxArray *plhs[], int nrhs, mxArray *prhs[]);
 
 #endif
 
-extern LIB_libMA_CPP_API void MW_CALL_CONV MA(int nargout, mwArray& solution, mwArray& TIME, const mwArray& V_MATRIX, const mwArray& TICK);
+extern LIB_libMA_CPP_API void MW_CALL_CONV MA(int nargout, mwArray& select_solution, mwArray& TIME, const mwArray& V_MATRIX, const mwArray& TICK);
 
 /* C++ INTERFACE -- WRAPPERS FOR USER-DEFINED MATLAB FUNCTIONS -- END */
 #endif

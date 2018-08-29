@@ -770,9 +770,9 @@ def add_scratch_programs(bld):
                 obj.install_path = None
                 
                 # added by yangyanning
-                obj.env.append_value("INCLUDES", "/home/haha/ns3.29-dev-workspace/ns-3-allinone/ns-3-dev/libdir/include")
-                obj.env.append_value("LIBPATH", ["/home/haha/ns3.29-dev-workspace/ns-3-allinone/ns-3-dev/libdir/lib"])
-                obj.env.append_value("LIB", ["add", "MA", "mwmclmcrrt"])
+                obj.env.append_value("INCLUDES", os.getcwd() + "/libdir/include")
+                obj.env.append_value("LIBPATH", [os.getcwd() + "/libdir/lib"])
+                obj.env.append_value("LIB", ["mwmclmcrrt", "MA", "add"])
             elif filename.endswith(".cc"):
                 name = filename[:-len(".cc")]
                 obj = bld.create_ns3_program(name, all_modules)
@@ -783,9 +783,9 @@ def add_scratch_programs(bld):
                 obj.install_path = None
                 
                 # added by yangyanning
-                obj.env.append_value("INCLUDES", "/home/haha/ns3.29-dev-workspace/ns-3-allinone/ns-3-dev/libdir/include")
-                obj.env.append_value("LIBPATH", ["/home/haha/ns3.29-dev-workspace/ns-3-allinone/ns-3-dev/libdir/lib"])
-                obj.env.append_value("LIB", ["add", "MA", "mwmclmcrrt"])
+                obj.env.append_value("INCLUDES", os.getcwd() + "/libdir/include")
+                obj.env.append_value("LIBPATH", [os.getcwd() + "/libdir/lib"])
+                obj.env.append_value("LIB", ["mwmclmcrrt", "MA", "add"])
     except OSError:
         return
 

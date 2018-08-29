@@ -75,7 +75,7 @@ NS_LOG_COMPONENT_DEFINE ("vanet-cs-vfc");
 
 #define Output_Result						false
 #define Console_Output_Result					false
-#define Loop_Scheduling						false
+#define Loop_Scheduling						true
 
 #define Scheme_1						"cs-vfc"
 #define Scheme_2						"ncb"
@@ -116,10 +116,10 @@ public:
    */
   VanetCsVfcExperiment ();
 
-//  /**
-//   * \brief virtual destructor
-//   */
-//  virtual ~VanetCsVfcExperiment ();
+  /**
+   * \brief destructor
+   */
+  ~VanetCsVfcExperiment ();
 
   /**
    * \brief Trace the receipt of an on-off-application generated packet
@@ -307,6 +307,8 @@ private:
 
   void ReceivePacketOnSchemeNcb (uint32_t nodeId, Ptr<const Packet> packet, const Address & srcAddr, const Address & destAddr);
 
+  void ReceivePacketOnSchemeMA (uint32_t nodeId, Ptr<const Packet> packet, const Address & srcAddr, const Address & destAddr);
+
   /**
    * \brief Set up a prescribed scenario
    * \return none
@@ -420,7 +422,6 @@ private:
   std::vector<uint32_t> globalDB;
   std::map<uint32_t, uint32_t> vehId2IndexMap;
   std::vector<bool> vehsEnterFlag;
-  std::vector<bool> vehsStatus; ///< vehicle is in the service area or not
   std::vector<std::set<uint32_t>> vehsReqs;
   std::vector<std::set<uint32_t>> vehsCaches;
   std::vector<std::set<uint32_t>> vehsInitialReqs;
@@ -453,12 +454,17 @@ private:
 
   uint32_t receive_count;
 
+  // Scheme NCB
   std::list<ReqQueueItem> requestQueue;
   std::map<uint32_t, ReqQueueItem> reqQueHead;
   std::map<uint32_t, std::set<uint32_t>> vehsToSatisfy;
   std::map<uint32_t, std::vector<uint32_t>> dataToBroadcast;
   std::map<std::string, bool> requestsToMarkGloabal;
   std::map<uint32_t, std::set<std::string>> requestsToMarkWithBid;
+
+  // Scheme MA
+  std::vector<bool> vehsStatus; ///< vehicle is in the service area or not
+  mwArray *mwVehsCachesMatrix; ///< cache matrix of all vehicles
 };
 
 
