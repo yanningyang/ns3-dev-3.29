@@ -39,6 +39,7 @@
 #include <mclcppclass.h>
 #include <matrix.h>
 #include "libMA.h"
+#include "libMADecode.h"
 
 NS_LOG_COMPONENT_DEFINE ("vanet-cs-vfc");
 
@@ -48,16 +49,16 @@ NS_LOG_COMPONENT_DEFINE ("vanet-cs-vfc");
 #define Lte_Enable 						false	// turn on/off LTE
 #define Upload_Enable 						false
 #define Cloud_Enable 						true
-#define Print_Log_Header_On_Receive 				true
-#define Print_Msg_Type 						true
-#define Print_Edge_Type 					true
+#define Print_Log_Header_On_Receive 				false
+#define Print_Msg_Type 						false
+#define Print_Edge_Type 					false
 #define Print_Received_Data_Cloud 				false
-#define Print_Received_Log 					true
-#define Print_Vehicle_Initial_Request 				false
+#define Print_Received_Log 					false
+#define Print_Vehicle_Initial_Request 				true
 #define Print_Vehicle_Initial_Cache 				false
 #define Print_Vehicle_Request 					false
 #define Print_Vehicle_Cache 					false
-#define Print_Vehicle_Final_Request 				false
+#define Print_Vehicle_Final_Request 				true
 #define Print_Vehicle_Final_Cache 				false
 #define Print_Fog_Cluster 					false
 #define Scheduling 						true
@@ -73,8 +74,8 @@ NS_LOG_COMPONENT_DEFINE ("vanet-cs-vfc");
 #define Packet_Size 						1024
 #define Total_Sim_Time 						581.01
 
-#define Output_Result						false
-#define Console_Output_Result					false
+#define Output_Result						true
+#define Console_Output_Result					true
 #define Loop_Scheduling						true
 
 #define Scheme_1						"cs-vfc"
@@ -83,21 +84,21 @@ NS_LOG_COMPONENT_DEFINE ("vanet-cs-vfc");
 
 #define Test_Bid						54
 
-#if Console_Output_Result
-
-#undef Print_Received_Log
-#define Print_Received_Log 					false
-
-#undef Print_Log_Header_On_Receive
-#define Print_Log_Header_On_Receive 				false
-
-#undef Print_Msg_Type
-#define Print_Msg_Type 						false
-
-#undef Print_Edge_Type
-#define Print_Edge_Type 					false
-
-#endif //Console_Output
+//#if Console_Output_Result
+//
+//#undef Print_Received_Log
+//#define Print_Received_Log 					false
+//
+//#undef Print_Log_Header_On_Receive
+//#define Print_Log_Header_On_Receive 				false
+//
+//#undef Print_Msg_Type
+//#define Print_Msg_Type 						false
+//
+//#undef Print_Edge_Type
+//#define Print_Edge_Type 					false
+//
+//#endif //Console_Output
 
 /**
  * This simulation is to show the routing service of WaveNetDevice described in IEEE 09.4.

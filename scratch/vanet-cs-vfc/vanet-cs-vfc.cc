@@ -59,6 +59,8 @@ VanetCsVfcExperiment::~VanetCsVfcExperiment ()
     {
       libMATerminate();
 
+      libMADecodeTerminate();
+
       mclTerminateApplication();
     }
 }
@@ -1516,6 +1518,17 @@ VanetCsVfcExperiment::MAandBroadcast ()
     }
   if (vehs.size() == 0) return;
 
+  bool flag = true;
+  for (uint32_t veh : vehs)
+    {
+      if (!vehsReqs[veh].empty())
+	{
+	  flag = false;
+	  break;
+	}
+    }
+  if (flag) return;
+
   mwSize dims[3] = {globalDbSize, globalDbSize, vehs.size()};
   mwArray mwVehsCachesMatrixTmp(3, dims, mxDOUBLE_CLASS);
   mwArray mwTick(1, 1, mxUINT32_CLASS);
@@ -1526,7 +1539,7 @@ VanetCsVfcExperiment::MAandBroadcast ()
 	{
 	  for (uint32_t j = 1; j <= globalDbSize; j++)
 	    {
-	      mwVehsCachesMatrixTmp(i, j, k) = (*mwVehsCachesMatrix)(i, j, veh);
+	      mwVehsCachesMatrixTmp(i, j, k) = (*mwVehsCachesMatrix)(i, j, veh + 1);
 	    }
 	}
       k += 1;
@@ -1540,6 +1553,7 @@ VanetCsVfcExperiment::MAandBroadcast ()
 
   cout << "----------------------------" << endl;
   uint32_t time = mwResult2.Get(1, 1);
+#if 1
   for (uint32_t i = 1; i <= time; i++)
     {
       std::cout << i << ":";
@@ -1556,31 +1570,32 @@ VanetCsVfcExperiment::MAandBroadcast ()
 	}
       std::cout << std::endl;
 
-//      m_requestStats.IncBroadcastPkts();
-//
-//      Ptr<UdpSender> sender = CreateObject<UdpSender>();
-//      sender->SetNode(m_remoteHost);
-//      sender->SetRemote(Ipv4Address ("10.2.255.255"), m_dlPort);
-//      sender->SetDataSize(Packet_Size);
-//      sender->Start();
-//      using vanet::PacketHeader;
-//      PacketHeader header;
-//      header.SetType(PacketHeader::MessageType::DATA_C2V);
-//      header.SetBroadcastId(currentBroadcastId);
-//      sender->SetHeader(header);
-//
-//      using vanet::PacketTagC2v;
-//      PacketTagC2v *pktTag = new PacketTagC2v();
-//      std::vector<uint32_t> reqsIds;
-//      for (uint32_t data : dataToBroadcast[currentBroadcastId])
-//	{
-//	  reqsIds.push_back(data);
-//	}
-//      pktTag->SetReqsIds(reqsIds);
-//      sender->SetPacketTag(pktTag);
-//
-//      Simulator::ScheduleNow (&UdpSender::Send, sender);
+      m_requestStats.IncBroadcastPkts();
+
+      Ptr<UdpSender> sender = CreateObject<UdpSender>();
+      sender->SetNode(m_remoteHost);
+      sender->SetRemote(Ipv4Address ("10.2.255.255"), m_dlPort);
+      sender->SetDataSize(Packet_Size);
+      sender->Start();
+      using vanet::PacketHeader;
+      PacketHeader header;
+      header.SetType(PacketHeader::MessageType::DATA_C2V);
+      header.SetBroadcastId(currentBroadcastId);
+      sender->SetHeader(header);
+
+      using vanet::PacketTagC2v;
+      PacketTagC2v *pktTag = new PacketTagC2v();
+      std::vector<uint32_t> reqsIds;
+      for (uint32_t data : dataToBroadcast[currentBroadcastId])
+	{
+	  reqsIds.push_back(data);
+	}
+      pktTag->SetReqsIds(reqsIds);
+      sender->SetPacketTag(pktTag);
+
+      Simulator::ScheduleNow (&UdpSender::Send, sender);
     }
+#endif
 }
 
 void
@@ -3039,6 +3054,9 @@ VanetCsVfcExperiment::ReceivePacketOnSchemeNcb (uint32_t nodeId, Ptr<const Packe
 void
 VanetCsVfcExperiment::ReceivePacketOnSchemeMA (uint32_t nodeId, Ptr<const Packet> packet, const Address & srcAddr, const Address & destAddr)
 {
+  uint32_t obuIdx = vehId2IndexMap.at(nodeId);
+  if (!vehsStatus[obuIdx]) return;
+
   std::ostringstream oss;
   oss << "sim time:" <<Simulator::Now ().GetSeconds () << ", clock: " << (double)(clock()) / CLOCKS_PER_SEC;
 #if Print_Log_Header_On_Receive
@@ -3082,8 +3100,6 @@ VanetCsVfcExperiment::ReceivePacketOnSchemeMA (uint32_t nodeId, Ptr<const Packet
 
   if (recvHeader.GetType() == PacketHeader::MessageType::DATA_C2V)
     {
-      uint32_t obuIdx = vehId2IndexMap.at(nodeId);
-
       using vanet::PacketTagC2v;
       PacketTagC2v pktTagC2v;
       pktCopy->RemovePacketTag(pktTagC2v);
@@ -3097,7 +3113,7 @@ VanetCsVfcExperiment::ReceivePacketOnSchemeMA (uint32_t nodeId, Ptr<const Packet
 	{
 	  for (uint32_t j = 1; j <= globalDbSize; j++)
 	    {
-	      vehCacheMatrix(i, j) = (*mwVehsCachesMatrix)(i, j, obuIdx);
+	      vehCacheMatrix(i, j) = (*mwVehsCachesMatrix)(i, j, obuIdx + 1);
 	    }
 	}
 
@@ -3105,6 +3121,46 @@ VanetCsVfcExperiment::ReceivePacketOnSchemeMA (uint32_t nodeId, Ptr<const Packet
       for (uint32_t dataIdx : datasIdxBroadcast)
 	{
 	  mwDatasIdxBroadcast(1, dataIdx + 1) = 1.0;
+	}
+
+//      cout << "vehCacheMatrix[" << obuIdx + 1 << "]:" << endl;
+//      for (uint32_t i = 1; i <= globalDbSize; i++)
+//	{
+//	  for (uint32_t j = 1; j <= globalDbSize; j++)
+//	    {
+//	      cout << " " << vehCacheMatrix(i, j);
+//	    }
+//	  cout << endl;
+//	}
+//      cout << "mwDatasIdxBroadcast:";
+//      for (uint32_t i = 1; i <= globalDbSize; i++)
+//	{
+//	  cout << " " << mwDatasIdxBroadcast(1, i);
+//	}
+//      cout << endl;
+
+
+      mwArray mwResult1(mxUINT32_CLASS);
+      mwArray mwResult2(mxUINT32_CLASS);
+      mwArray mwResult3(mxDOUBLE_CLASS);
+      MADecode(3, mwResult1, mwResult2, mwResult3, vehCacheMatrix, mwDatasIdxBroadcast);
+      uint32_t flag = mwResult1(1, 1);
+      if (flag == 1)
+	{
+	  uint32_t dataToCached = mwResult2(1, 1);
+	  dataToCached -= 1;
+
+	  vehsCaches[obuIdx].insert(dataToCached);
+	  vehsReqs[obuIdx].erase(dataToCached);
+	  RecordStats(obuIdx, dataToCached);
+	}
+
+      for (uint32_t i = 1; i <= globalDbSize; i++)
+	{
+	  for (uint32_t j = 1; j <= globalDbSize; j++)
+	    {
+	      (*mwVehsCachesMatrix)(i, j, obuIdx + 1) = mwResult3(i, j);
+	    }
 	}
     }
 
@@ -3222,29 +3278,37 @@ VanetCsVfcExperiment::Initialization ()
     }
 #endif
 
+#if 1
   // initialize libMAInitialize
   if (m_schemeName.compare(Scheme_3) == 0)
     {
       if(!libMAInitialize())
       {
-	  std::cout << "Could not initialize libMA!" << std::endl;
-	  return;
+	std::cout << "Could not initialize libMA!" << std::endl;
+	return;
+      }
+      if(!libMADecodeInitialize())
+      {
+	std::cout << "Could not initialize libMADecode!" << std::endl;
+	return;
       }
 
       mwSize dims[3] = {globalDbSize, globalDbSize, m_nObuNodes};
       mwVehsCachesMatrix = new mwArray(3, dims, mxDOUBLE_CLASS);
-      mwArray mwTick(1, 1, mxUINT32_CLASS);
       for (uint32_t obuIdx = 0; obuIdx < m_nObuNodes; obuIdx++)
         {
+	  uint32_t k = 1;
           for (uint32_t i = 0; i < globalDbSize; i++)
 	    {
 	      if (vehsInitialCaches[obuIdx].count(i))
 		{
-		  (*mwVehsCachesMatrix)(i + 1, i + 1, obuIdx) = 1.0;
+		  (*mwVehsCachesMatrix)(k, i + 1, obuIdx + 1) = 1.0;
+		  k += 1;
 		}
 	    }
         }
     }
+#endif
 }
 
 int

@@ -772,7 +772,7 @@ def add_scratch_programs(bld):
                 # added by yangyanning
                 obj.env.append_value("INCLUDES", os.getcwd() + "/libdir/include")
                 obj.env.append_value("LIBPATH", [os.getcwd() + "/libdir/lib"])
-                obj.env.append_value("LIB", ["mwmclmcrrt", "MA", "add"])
+                obj.env.append_value("LIB", ["mwmclmcrrt", "MA", "add", "MADecode"])
             elif filename.endswith(".cc"):
                 name = filename[:-len(".cc")]
                 obj = bld.create_ns3_program(name, all_modules)
@@ -785,7 +785,7 @@ def add_scratch_programs(bld):
                 # added by yangyanning
                 obj.env.append_value("INCLUDES", os.getcwd() + "/libdir/include")
                 obj.env.append_value("LIBPATH", [os.getcwd() + "/libdir/lib"])
-                obj.env.append_value("LIB", ["mwmclmcrrt", "MA", "add"])
+                obj.env.append_value("LIB", ["mwmclmcrrt", "MA", "add", "MADecode"])
     except OSError:
         return
 

@@ -102,41 +102,41 @@ main (int argc, char *argv[])
 
   mwArray *haha;
 
-  if( !libaddInitialize())
-  {
-    std::cout << "Could not initialize libadd!" << std::endl;
-    return -1;
-  }
-
-//  double a = 1;
-//  double b = 4;
-  double c;
-
-  mwArray mwA(1, 1, mxDOUBLE_CLASS);
-  mwArray mwB(1, 1, mxDOUBLE_CLASS);
-  mwArray mwC(mxDOUBLE_CLASS);
-  mwArray mwD(2, 2, mxDOUBLE_CLASS);
-
-  mwA(1, 1) = 2;
-  mwB(1, 1) = 4;
-
-  mwD(1, 1) = 1;
-  mwD(1, 2) = 2;
-  mwD(2, 1) = 3;
-  mwD(2, 2) = 4;
-
-  add(1, mwC, mwA, mwB);
-
-  c = (double)mwC.Get(1, 1);
-
-  cout<<"The sum is: "<<c<<endl;
-
-  cout<<"mwD(1, 1): "<< mwD(1, 1) <<endl;
-  cout<<"mwD(1, 2): "<< mwD(1, 2) <<endl;
-  cout<<"mwD(2, 1): "<< mwD(2, 1) <<endl;
-  cout<<"mwD(2, 2): "<< mwD(2, 2) <<endl;
-
-  libaddTerminate();
+//  if( !libaddInitialize())
+//  {
+//    std::cout << "Could not initialize libadd!" << std::endl;
+//    return -1;
+//  }
+//
+////  double a = 1;
+////  double b = 4;
+//  double c;
+//
+//  mwArray mwA(1, 1, mxDOUBLE_CLASS);
+//  mwArray mwB(1, 1, mxDOUBLE_CLASS);
+//  mwArray mwC(mxDOUBLE_CLASS);
+//  mwArray mwD(2, 2, mxDOUBLE_CLASS);
+//
+//  mwA(1, 1) = 2;
+//  mwB(1, 1) = 4;
+//
+//  mwD(1, 1) = 1;
+//  mwD(1, 2) = 2;
+//  mwD(2, 1) = 3;
+//  mwD(2, 2) = 4;
+//
+//  add(1, mwC, mwA, mwB);
+//
+//  c = (double)mwC.Get(1, 1);
+//
+//  cout<<"The sum is: "<<c<<endl;
+//
+//  cout<<"mwD(1, 1): "<< mwD(1, 1) <<endl;
+//  cout<<"mwD(1, 2): "<< mwD(1, 2) <<endl;
+//  cout<<"mwD(2, 1): "<< mwD(2, 1) <<endl;
+//  cout<<"mwD(2, 2): "<< mwD(2, 2) <<endl;
+//
+//  libaddTerminate();
 
   if( !libMAInitialize())
   {
