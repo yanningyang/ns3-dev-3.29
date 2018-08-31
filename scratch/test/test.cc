@@ -235,7 +235,7 @@ main (int argc, char *argv[])
 //  streambuf* coutbackup;
 //  coutbackup = std::cout.rdbuf(ofs.rdbuf());
 
-  std::cout << "globalDbSize: \t " << std::endl;
+  std::cout << "1globalDbSize: \t " << std::endl;
   std::cout << "TimeSpent: \t\t " << std::endl;
   std::cout << "receive_count: \t " << std::endl;
   std::cout << "SubmittedReqs: \t " << std::endl;

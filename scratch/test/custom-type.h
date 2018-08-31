@@ -8,7 +8,7 @@
 #ifndef SCRATCH_VANET_CS_VFC_CUSTOM_TYPE_H_
 #define SCRATCH_VANET_CS_VFC_CUSTOM_TYPE_H_
 
-#include <bits/stdint-uintn.h>
+//#include <bits/stdint-uintn.h>
 #include <string>
 #include <sstream>
 #include <ostream>
