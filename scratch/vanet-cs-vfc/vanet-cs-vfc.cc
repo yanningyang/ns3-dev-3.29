@@ -30,7 +30,7 @@ VanetCsVfcExperiment::VanetCsVfcExperiment ():
     m_bsTxp (166.1), // 2122m
     m_phyMode ("OfdmRate6MbpsBW10MHz"),
     m_traceMobility (false),
-    m_workspacePath ("/home/haha/ns3.29-dev-workspace/workspace/vanet-cs-vfc"),
+    m_workspacePath ("../workspace/vanet-cs-vfc"),
     m_mobilityFile (m_workspacePath + "/mobility" + "/mobility.tcl"),
     m_mobLogFile (m_workspacePath + "/mobility.log"),
     m_trName (m_workspacePath + "/vanet-cs-vfc.mob"),
@@ -81,6 +81,29 @@ VanetCsVfcExperiment::Simulate (int argc, char **argv)
   ConfigureTracing ();
   RunSimulation ();
   ProcessOutputs ();
+}
+
+int
+VanetCsVfcExperiment::MkPath(std::string s,mode_t mode=0755)
+{
+  size_t pre=0,pos;
+  std::string dir;
+  int mdret;
+
+  if(s[s.size()-1]!='/'){
+      // force trailing / so we can handle everything in loop
+      s+='/';
+  }
+
+  while((pos=s.find_first_of('/',pre))!=std::string::npos){
+      dir=s.substr(0,pos++);
+      pre=pos;
+      if(dir.size()==0) continue; // if leading / first time is 0 length
+      if((mdret=::mkdir(dir.c_str(),mode)) && errno!=EEXIST){
+          return mdret;
+      }
+  }
+  return mdret;
 }
 
 void
@@ -400,8 +423,13 @@ VanetCsVfcExperiment::ProcessOutputs ()
 
 #if Output_Result
 #if !Console_Output_Result
+  std::string outputDir = m_workspacePath + "/result";
+  if (access(outputDir.c_str(), 0) == -1)
+    {
+      MkPath(outputDir);
+    }
   std::ostringstream oss;
-  oss << m_workspacePath << "/result/" << m_schemeName << "-out.txt";
+  oss << outputDir << "/" << m_schemeName << ".txt";
   std::ofstream ofs; ///< output stream
   ofs.open (oss.str(), ios::app);
   streambuf* coutbackup;
@@ -433,7 +461,7 @@ VanetCsVfcExperiment::ProcessOutputs ()
   ofs.close ();
 
   std::ostringstream oss1;
-  oss1 << m_workspacePath << "/result/" << m_schemeName << "-out.dat";
+  oss1 << outputDir << "/" << m_schemeName << ".dat";
   ofs.open (oss1.str(), ios::app);
 //  m_ofs << "DbSize " << "ASD " << "SR " << "BE " << std::endl;
   std::cout << globalDbSize << " " << ASD << " " << SR << " " << BE << std::endl;
@@ -1545,20 +1573,19 @@ VanetCsVfcExperiment::MAandBroadcast ()
       k += 1;
     }
 
-  mwTick(1, 1) = 3;
+  mwTick(1, 1) = Num_Cliques;
 
   mwArray mwResult1(mxUINT32_CLASS);
   mwArray mwResult2(1, 1, mxUINT32_CLASS);
   MA(2, mwResult1, mwResult2, mwVehsCachesMatrixTmp, mwTick);
 
-  cout << "----------------------------" << endl;
+  cout << "sim time " << Now().GetSeconds() << " ----------------------------" << endl;
   uint32_t time = mwResult2.Get(1, 1);
-#if 1
   for (uint32_t i = 1; i <= time; i++)
     {
-      std::cout << i << ":";
-
       currentBroadcastId++;
+      std::cout << "bID " << currentBroadcastId << ":";
+
       for (uint32_t j = 1; j <= globalDbSize; j++)
 	{
 	  std::cout << " " << mwResult1(i, j);
@@ -1595,7 +1622,6 @@ VanetCsVfcExperiment::MAandBroadcast ()
 
       Simulator::ScheduleNow (&UdpSender::Send, sender);
     }
-#endif
 }
 
 void
@@ -1621,6 +1647,7 @@ VanetCsVfcExperiment::CommandSetup (int argc, char **argv)
   cmd.AddValue ("asciiTrace", "Dump ASCII Trace data", m_asciiTrace);
   cmd.AddValue ("pcap", "Create PCAP files for all nodes", m_pcap);
 
+  cmd.AddValue ("nVeh", "number of vehicles", m_nObuNodes);
   cmd.AddValue ("schemeName", "scheduling algorithm name", m_schemeName);
   cmd.AddValue ("globalDbSize", "size of global database", globalDbSize);
 
@@ -3149,6 +3176,8 @@ VanetCsVfcExperiment::ReceivePacketOnSchemeMA (uint32_t nodeId, Ptr<const Packet
 	{
 	  uint32_t dataToCached = mwResult2(1, 1);
 	  dataToCached -= 1;
+
+	  NS_LOG_UNCOND("dataToCached: " << dataToCached);
 
 	  vehsCaches[obuIdx].insert(dataToCached);
 	  vehsReqs[obuIdx].erase(dataToCached);

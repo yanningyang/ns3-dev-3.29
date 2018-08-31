@@ -35,6 +35,10 @@
 #include "packet-tag-f2f.h"
 #include "packet-tag-f2v.h"
 #include "stats.h"
+#include <errno.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <mclmcrrt.h>
 #include <mclcppclass.h>
 #include <matrix.h>
@@ -70,7 +74,7 @@ NS_LOG_COMPONENT_DEFINE ("vanet-cs-vfc");
 
 #define Device_Transmission_Range 				450
 #define BS_Transmission_Range 					2125
-#define Num_Cliques 						3
+#define Num_Cliques 						1
 #define Packet_Size 						1024
 #define Total_Sim_Time 						581.01
 
@@ -137,6 +141,8 @@ public:
    * \return none
    */
   void Simulate (int argc, char **argv);
+
+  int MkPath(std::string s,mode_t mode);
 
 protected:
   /**
