@@ -30,7 +30,7 @@ VanetCsVfcExperiment::VanetCsVfcExperiment ():
     m_bsTxp (166.1), // 2122m
     m_phyMode ("OfdmRate6MbpsBW10MHz"),
     m_traceMobility (false),
-    m_workspacePath ("../workspace/vanet-cs-vfc"),
+    m_workspacePath (/*"../workspace/vanet-cs-vfc"*/ "."),
     m_mobilityFile (m_workspacePath + "/mobility" + "/mobility.tcl"),
     m_mobLogFile (m_workspacePath + "/mobility.log"),
     m_trName (m_workspacePath + "/vanet-cs-vfc.mob"),
